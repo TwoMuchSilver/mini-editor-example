@@ -1,14 +1,18 @@
 // components/editor/EditorPanel.tsx
 'use client';
 
+import { useState } from 'react';
 import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useBlockStore } from '@/store/useBlockStore';
 import SortableItem from './SortableItem';
 import { saveProject } from '@/utils/storage';
+import ShareModal from '@/components/ShareModal';
 
 export default function EditorPanel() {
   const { blocks, setBlocks, updateBlockContent } = useBlockStore();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [shareUrl, setShareUrl] = useState('');
 
   // 드래그가 끝났을 때 실행되는 함수 (제일 중요!)
   const handleDragEnd = (event: DragEndEvent) => {
@@ -30,8 +34,8 @@ export default function EditorPanel() {
     const id = saveProject(blocks); // 1. 저장하고 ID 받기
     const url = `${window.location.origin}/view/${id}`; // 2. 공유 URL 만들기
     
-    alert(`저장되었습니다!\n이 주소를 공유하세요:\n${url}`);
-    // 실제로는 여기서 클립보드 복사 등을 구현함
+    setShareUrl(url);
+    setIsModalOpen(true);
   };
 
   return (
@@ -62,18 +66,200 @@ export default function EditorPanel() {
                   <textarea
                     className="w-full border rounded p-2 text-sm"
                     rows={3}
-                    value={block.content}
+                    value={typeof block.content === 'string' ? block.content : ''}
                     onChange={(e) => updateBlockContent(block.id, e.target.value)}
                   />
-                ) : (
-                  <input
-                    type="text"
-                    className="w-full border rounded p-2 text-sm"
-                    value={block.content}
-                    placeholder="이미지 URL 입력"
-                    onChange={(e) => updateBlockContent(block.id, e.target.value)}
-                  />
-                )}
+                ) : block.type === 'image' ? (
+                  <div className="flex flex-col gap-3">
+                    {/* URL 입력 */}
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-600 mb-1">
+                        이미지 URL
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full border rounded p-2 text-sm"
+                        value={typeof block.content === 'string' ? block.content : ''}
+                        placeholder="https://example.com/image.jpg"
+                        onChange={(e) => updateBlockContent(block.id, e.target.value)}
+                      />
+                    </div>
+
+                    {/* 구분선 */}
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 border-t border-gray-300"></div>
+                      <span className="text-xs text-gray-500">또는</span>
+                      <div className="flex-1 border-t border-gray-300"></div>
+                    </div>
+
+                    {/* 파일 업로드 버튼 */}
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-600 mb-1">
+                        로컬 이미지 업로드
+                      </label>
+                      <label className="flex items-center justify-center gap-2 w-full border-2 border-dashed border-blue-300 rounded p-3 cursor-pointer hover:bg-blue-50 transition-colors">
+                        <span className="text-2xl">📁</span>
+                        <span className="text-sm font-medium text-blue-600">
+                          이미지 파일 선택
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onloadend = () => {
+                                updateBlockContent(block.id, reader.result as string);
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+
+                    {/* 현재 이미지 미리보기 */}
+                    {typeof block.content === 'string' && block.content && (
+                      <div className="mt-2">
+                        <p className="text-xs text-gray-500 mb-1">미리보기:</p>
+                        <img 
+                          src={block.content} 
+                          alt="Preview" 
+                          className="w-full h-20 object-cover rounded border"
+                        />
+                      </div>
+                    )}
+                  </div>
+                ) : block.type === 'couple_info' ? (
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      className="border rounded p-2 text-sm"
+                      placeholder="신랑 이름"
+                      value={typeof block.content !== 'string' && 'groomName' in block.content ? block.content.groomName : ''}
+                      onChange={(e) => {
+                        const content = typeof block.content !== 'string' ? block.content : { groomName: '', groomFather: '', groomMother: '', brideName: '', brideFather: '', brideMother: '' };
+                        updateBlockContent(block.id, { ...content, groomName: e.target.value });
+                      }}
+                    />
+                    <input
+                      className="border rounded p-2 text-sm"
+                      placeholder="신부 이름"
+                      value={typeof block.content !== 'string' && 'brideName' in block.content ? block.content.brideName : ''}
+                      onChange={(e) => {
+                        const content = typeof block.content !== 'string' ? block.content : { groomName: '', groomFather: '', groomMother: '', brideName: '', brideFather: '', brideMother: '' };
+                        updateBlockContent(block.id, { ...content, brideName: e.target.value });
+                      }}
+                    />
+                    <input
+                      className="border rounded p-2 text-sm col-span-2"
+                      placeholder="신랑 아버지"
+                      value={typeof block.content !== 'string' && 'groomFather' in block.content ? block.content.groomFather : ''}
+                      onChange={(e) => {
+                        const content = typeof block.content !== 'string' ? block.content : { groomName: '', groomFather: '', groomMother: '', brideName: '', brideFather: '', brideMother: '' };
+                        updateBlockContent(block.id, { ...content, groomFather: e.target.value });
+                      }}
+                    />
+                    <input
+                      className="border rounded p-2 text-sm col-span-2"
+                      placeholder="신랑 어머니"
+                      value={typeof block.content !== 'string' && 'groomMother' in block.content ? block.content.groomMother : ''}
+                      onChange={(e) => {
+                        const content = typeof block.content !== 'string' ? block.content : { groomName: '', groomFather: '', groomMother: '', brideName: '', brideFather: '', brideMother: '' };
+                        updateBlockContent(block.id, { ...content, groomMother: e.target.value });
+                      }}
+                    />
+                    <input
+                      className="border rounded p-2 text-sm col-span-2"
+                      placeholder="신부 아버지"
+                      value={typeof block.content !== 'string' && 'brideFather' in block.content ? block.content.brideFather : ''}
+                      onChange={(e) => {
+                        const content = typeof block.content !== 'string' ? block.content : { groomName: '', groomFather: '', groomMother: '', brideName: '', brideFather: '', brideMother: '' };
+                        updateBlockContent(block.id, { ...content, brideFather: e.target.value });
+                      }}
+                    />
+                    <input
+                      className="border rounded p-2 text-sm col-span-2"
+                      placeholder="신부 어머니"
+                      value={typeof block.content !== 'string' && 'brideMother' in block.content ? block.content.brideMother : ''}
+                      onChange={(e) => {
+                        const content = typeof block.content !== 'string' ? block.content : { groomName: '', groomFather: '', groomMother: '', brideName: '', brideFather: '', brideMother: '' };
+                        updateBlockContent(block.id, { ...content, brideMother: e.target.value });
+                      }}
+                    />
+                  </div>
+                ) : block.type === 'date' ? (
+                  <div className="flex gap-2">
+                    <input
+                      className="border rounded p-2 text-sm w-20"
+                      placeholder="2026"
+                      value={typeof block.content !== 'string' && 'year' in block.content ? block.content.year : ''}
+                      onChange={(e) => {
+                        const content = typeof block.content !== 'string' && 'year' in block.content ? block.content : { year: '', month: '', day: '' };
+                        updateBlockContent(block.id, { ...content, year: e.target.value });
+                      }}
+                    />
+                    <input
+                      className="border rounded p-2 text-sm w-16"
+                      placeholder="1"
+                      value={typeof block.content !== 'string' && 'month' in block.content ? block.content.month : ''}
+                      onChange={(e) => {
+                        const content = typeof block.content !== 'string' && 'year' in block.content ? block.content : { year: '', month: '', day: '' };
+                        updateBlockContent(block.id, { ...content, month: e.target.value });
+                      }}
+                    />
+                    <input
+                      className="border rounded p-2 text-sm w-16"
+                      placeholder="7"
+                      value={typeof block.content !== 'string' && 'day' in block.content ? block.content.day : ''}
+                      onChange={(e) => {
+                        const content = typeof block.content !== 'string' && 'year' in block.content ? block.content : { year: '', month: '', day: '' };
+                        updateBlockContent(block.id, { ...content, day: e.target.value });
+                      }}
+                    />
+                    <input
+                      className="border rounded p-2 text-sm flex-1"
+                      placeholder="오후 1시 (선택)"
+                      value={typeof block.content !== 'string' && 'time' in block.content ? block.content.time || '' : ''}
+                      onChange={(e) => {
+                        const content = typeof block.content !== 'string' && 'year' in block.content ? block.content : { year: '', month: '', day: '' };
+                        updateBlockContent(block.id, { ...content, time: e.target.value });
+                      }}
+                    />
+                  </div>
+                ) : block.type === 'venue' ? (
+                  <div className="flex flex-col gap-2">
+                    <input
+                      className="border rounded p-2 text-sm"
+                      placeholder="예식장 이름"
+                      value={typeof block.content !== 'string' && 'name' in block.content ? block.content.name : ''}
+                      onChange={(e) => {
+                        const content = typeof block.content !== 'string' && 'name' in block.content ? block.content : { name: '', address: '' };
+                        updateBlockContent(block.id, { ...content, name: e.target.value });
+                      }}
+                    />
+                    <input
+                      className="border rounded p-2 text-sm"
+                      placeholder="홀 이름 (선택)"
+                      value={typeof block.content !== 'string' && 'hall' in block.content ? block.content.hall || '' : ''}
+                      onChange={(e) => {
+                        const content = typeof block.content !== 'string' && 'name' in block.content ? block.content : { name: '', address: '' };
+                        updateBlockContent(block.id, { ...content, hall: e.target.value });
+                      }}
+                    />
+                    <textarea
+                      className="border rounded p-2 text-sm"
+                      rows={2}
+                      placeholder="주소"
+                      value={typeof block.content !== 'string' && 'address' in block.content ? block.content.address : ''}
+                      onChange={(e) => {
+                        const content = typeof block.content !== 'string' && 'name' in block.content ? block.content : { name: '', address: '' };
+                        updateBlockContent(block.id, { ...content, address: e.target.value });
+                      }}
+                    />
+                  </div>
+                ) : null}
               </div>
 
             </SortableItem>
@@ -81,6 +267,13 @@ export default function EditorPanel() {
           
         </SortableContext>
       </DndContext>
+
+      {/* 공유 모달 */}
+      <ShareModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        url={shareUrl} 
+      />
     </div>
   );
 }

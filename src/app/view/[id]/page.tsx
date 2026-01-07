@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'; // URL의 id를 가져오는 훅
 import { loadProject } from '@/utils/storage';
 import { Block } from '@/types/block';
 import BlockRenderer from '@/components/BlockRenderer';
+import DynamicMetaTags from '@/components/DynamicMetaTags';
 
 export default function ViewerPage() {
   const params = useParams();
@@ -26,20 +27,25 @@ export default function ViewerPage() {
   if (!blocks) return <div className="text-center p-10">청첩장을 찾을 수 없습니다. 😢</div>;
 
   return (
-    <main className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      {/* 핸드폰 모양 프레임 (편집 기능 없음!) */}
-      <div className="w-[375px] min-h-[500px] bg-white shadow-2xl rounded-3xl overflow-hidden border-3 border-gray-800">
-        <div className="h-6 bg-gray-800 w-full"></div>
-        
-        <div className="flex flex-col">
-          {/* 핵심: 에디터에서 썼던 그 BlockRenderer를 그대로 재사용! 
-             하지만 드래그 기능도, 편집 기능도 없는 '순수 뷰어' 상태임.
-          */}
-          {blocks.map((block) => (
-            <BlockRenderer key={block.id} block={block} />
-          ))}
+    <>
+      {/* 동적 메타 태그 (클라이언트에서 업데이트 - 제한적) */}
+      <DynamicMetaTags blocks={blocks} />
+      
+      <main className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        {/* 핸드폰 모양 프레임 (편집 기능 없음!) */}
+        <div className="w-[375px] min-h-[500px] bg-white shadow-2xl rounded-3xl overflow-hidden border-3 border-gray-800">
+          <div className="h-6 bg-gray-800 w-full"></div>
+          
+          <div className="flex flex-col">
+            {/* 핵심: 에디터에서 썼던 그 BlockRenderer를 그대로 재사용! 
+               하지만 드래그 기능도, 편집 기능도 없는 '순수 뷰어' 상태임.
+            */}
+            {blocks.map((block) => (
+              <BlockRenderer key={block.id} block={block} />
+            ))}
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   );
 }

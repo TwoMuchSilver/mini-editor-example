@@ -19,7 +19,7 @@ export default function TextBlock({ block }: Props) {
         whiteSpace: 'pre-wrap' // 줄바꿈 적용
       }}
     >
-      {block.content}
+      {typeof block.content === 'string' ? block.content : ''}
     </div>
   );
 }

@@ -1,17 +1,46 @@
 // store/useBlockStore.ts
 import { create } from 'zustand';
-import { Block } from '@/types/block';
+import { Block, CoupleInfo, WeddingDate, VenueInfo } from '@/types/block';
 
-// 초기 데이터 (나중엔 서버에서 받아오거나 빈 배열로 시작)
+// 초기 데이터 (빈 placeholder로 시작)
 const INITIAL_BLOCKS: Block[] = [
-  { id: 'b1', type: 'image', content: 'https://images.unsplash.com/photo-1519741497674-611481863552?ixlib=rb-4.0.3&w=800&q=80' },
-  { id: 'b2', type: 'text', content: '김철수 & 이영희\n결혼합니다', styles: { fontSize: '24px', align: 'center' } },
-  { id: 'b3', type: 'text', content: '2026년 1월 6일 오후 1시', styles: { fontSize: '16px', color: '#666', align: 'center' } },
+  { id: 'b1', type: 'image', content: '' },
+  { 
+    id: 'b2', 
+    type: 'couple_info', 
+    content: {
+      groomName: '',
+      groomFather: '',
+      groomMother: '',
+      brideName: '',
+      brideFather: '',
+      brideMother: ''
+    } as CoupleInfo
+  },
+  { 
+    id: 'b3', 
+    type: 'date', 
+    content: {
+      year: '',
+      month: '',
+      day: '',
+      time: ''
+    } as WeddingDate
+  },
+  {
+    id: 'b4',
+    type: 'venue',
+    content: {
+      name: '',
+      hall: '',
+      address: ''
+    } as VenueInfo
+  },
 ];
 
 interface BlockState {
   blocks: Block[];
-  updateBlockContent: (id: string, newContent: string) => void;
+  updateBlockContent: (id: string, newContent: string | CoupleInfo | WeddingDate | VenueInfo) => void;
   setBlocks: (newBlocks: Block[]) => void; // 순서 변경용
 }
 

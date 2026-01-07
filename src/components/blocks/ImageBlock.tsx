@@ -8,10 +8,15 @@ interface Props {
 }
 
 export default function ImageBlock({ block }: Props) {
+  // 데이터가 비어있으면 예시 이미지 표시
+  const imageUrl = (typeof block.content === 'string' && block.content) 
+    ? block.content 
+    : 'https://images.unsplash.com/photo-1519741497674-611481863552?ixlib=rb-4.0.3&w=800&q=80';
+  
   return (
     <div className="w-full">
       <img 
-        src={block.content} 
+        src={imageUrl} 
         alt="Wedding Image" 
         className="w-full h-auto object-cover" // 꽉 차게 보이기
       />
