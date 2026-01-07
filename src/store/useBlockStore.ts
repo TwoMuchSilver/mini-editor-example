@@ -1,6 +1,6 @@
 // store/useBlockStore.ts
 import { create } from 'zustand';
-import { Block, CoupleInfo, WeddingDate, VenueInfo } from '@/types/block';
+import { Block, CoupleInfo, WeddingDate, VenueInfo, GlobalTheme } from '@/types/block';
 
 // 초기 데이터 (빈 placeholder로 시작)
 const INITIAL_BLOCKS: Block[] = [
@@ -40,12 +40,22 @@ const INITIAL_BLOCKS: Block[] = [
 
 interface BlockState {
   blocks: Block[];
+  theme: GlobalTheme;
   updateBlockContent: (id: string, newContent: string | CoupleInfo | WeddingDate | VenueInfo) => void;
   setBlocks: (newBlocks: Block[]) => void; // 순서 변경용
+  setTheme: (newTheme: GlobalTheme) => void; // 테마 변경용
 }
 
+// 기본 테마
+const DEFAULT_THEME: GlobalTheme = {
+  backgroundColor: '#ffffff',
+  fontFamily: 'system-ui, sans-serif',
+  primaryColor: '#6366f1',
+};
+
 export const useBlockStore = create<BlockState>((set) => ({
-  blocks: INITIAL_BLOCKS, // 실제(초기) 데이터터
+  blocks: INITIAL_BLOCKS, // 실제(초기) 데이터
+  theme: DEFAULT_THEME, // 기본 테마
 
   // 1. 내용 수정하기 (불변성 유지)
   updateBlockContent: (id, newContent) => 
@@ -58,4 +68,7 @@ export const useBlockStore = create<BlockState>((set) => ({
 
   // 2. 블록 통째로 교체하기 (드래그 앤 드롭 후 순서 바뀐 배열 저장)
   setBlocks: (newBlocks) => set({ blocks: newBlocks }),
+
+  // 3. 테마 변경하기
+  setTheme: (newTheme) => set({ theme: newTheme }),
 }));

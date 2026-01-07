@@ -18,7 +18,7 @@ export default function DateBlock({ block }: Props) {
   const formattedDate = `${year}년 ${month}월 ${day}일`;
   
   return (
-    <div className="w-full p-6 text-center bg-white">
+    <div className="w-full p-6 text-center">
       <div className="max-w-sm mx-auto">
         <p className="text-sm text-gray-500 mb-2">결혼식 날짜</p>
         <p className="text-2xl font-semibold text-gray-800 mb-2">

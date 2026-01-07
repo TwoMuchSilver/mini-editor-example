@@ -1,6 +1,13 @@
 // 1. 우리가 지원할 블록의 종류
 export type BlockType = 'text' | 'image' | 'couple_info' | 'date' | 'venue';
 
+// 1-1. 글로벌 테마 타입
+export interface GlobalTheme {
+  backgroundColor: string;
+  fontFamily: string;
+  primaryColor: string;
+}
+
 // 2. 신랑신부 정보 데이터 구조
 export interface CoupleInfo {
   groomName: string;

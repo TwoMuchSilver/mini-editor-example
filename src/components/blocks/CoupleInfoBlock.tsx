@@ -17,7 +17,7 @@ export default function CoupleInfoBlock({ block }: Props) {
   const brideMother = info.brideMother || '최00';
   
   return (
-    <div className="w-full p-6 bg-gradient-to-b from-pink-50 to-white">
+    <div className="w-full p-6">
       <div className="max-w-md mx-auto">
         {/* 가로 배치: 신랑 | 하트 | 신부 */}
         <div className="flex items-start justify-center gap-6">

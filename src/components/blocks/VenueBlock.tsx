@@ -14,7 +14,7 @@ export default function VenueBlock({ block }: Props) {
   const address = venue.address || '서울특별시 강남구 테헤란로 123';
   
   return (
-    <div className="w-full p-6 bg-gray-50">
+    <div className="w-full p-6">
       <div className="max-w-sm mx-auto text-center">
         <p className="text-sm text-gray-500 mb-3">예식장</p>
         

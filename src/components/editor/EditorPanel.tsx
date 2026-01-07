@@ -8,9 +8,10 @@ import { useBlockStore } from '@/store/useBlockStore';
 import SortableItem from './SortableItem';
 import { saveProject } from '@/utils/storage';
 import ShareModal from '@/components/ShareModal';
+import TemplateSelector from './TemplateSelector';
 
 export default function EditorPanel() {
-  const { blocks, setBlocks, updateBlockContent } = useBlockStore();
+  const { blocks, theme, setBlocks, updateBlockContent } = useBlockStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
 
@@ -31,7 +32,7 @@ export default function EditorPanel() {
 
   // 추가된 함수: 저장 버튼 클릭 시
   const handleSave = () => {
-    const id = saveProject(blocks); // 1. 저장하고 ID 받기
+    const id = saveProject(blocks, theme); // 1. 블록과 테마 함께 저장하고 ID 받기
     const url = `${window.location.origin}/view/${id}`; // 2. 공유 URL 만들기
     
     setShareUrl(url);
@@ -41,13 +42,19 @@ export default function EditorPanel() {
   return (
     <div className="w-full h-full bg-gray-50 p-6 overflow-y-auto">
       <h2 className="text-xl font-bold mb-6">청첩장 편집</h2>
-      {/* 저장 버튼 추가 */}
-      <button 
+      
+      {/* 👇 템플릿 선택기 추가 */}
+      <TemplateSelector />
+      
+      {/* 저장 버튼 */}
+      <div className="mb-6">
+        <button 
           onClick={handleSave}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm font-bold"
+          className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 font-semibold shadow-md hover:shadow-lg transition-all duration-200"
         >
-          저장 & 공유
+          💾 저장 & 공유하기
         </button>
+      </div>
       {/* 1. DnD 컨텍스트 시작 : 이 태그 안은 물리법칙(드래그)가 적용됨 */}
       <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         
