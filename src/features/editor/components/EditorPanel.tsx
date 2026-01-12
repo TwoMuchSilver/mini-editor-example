@@ -48,13 +48,13 @@ export default function EditorPanel() {
       </div>
       {/* 1. DnD 컨텍스트 시작 : 이 태그 안은 물리법칙(드래그)가 적용됨 */}
       <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        
-        {/* 2. 정렬 가능한 영역 설정 (vertical 리스트) : 이 태그 안은 드래그 가능한 리스트들*/}
-        <SortableContext items={blocks} strategy={verticalListSortingStrategy}>
           
-          {blocks.map((block) => (
-            // 3. 아까 만든 움직이는 껍데기
-            <SortableItem key={block.id} id={block.id}>
+          {/* 2. 정렬 가능한 영역 설정 (vertical 리스트) : 이 태그 안은 드래그 가능한 리스트들*/}
+          <SortableContext items={blocks} strategy={verticalListSortingStrategy}>
+            
+            {blocks.map((block) => (
+              // 3. 아까 만든 움직이는 껍데기
+              <SortableItem key={block.id} id={block.id}>
               
               {/* 블록 타입에 따라 다른 입력창 보여주기 */}
               <div className="flex flex-col gap-2">
@@ -270,7 +270,8 @@ export default function EditorPanel() {
       <ShareModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
-        url={shareUrl} 
+        url={shareUrl}
+        blocks={blocks}
       />
     </div>
   );
