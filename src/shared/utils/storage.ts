@@ -63,20 +63,31 @@ class LocalStorageProjectStorage implements ProjectStorage {
 export const projectStorage: ProjectStorage = new LocalStorageProjectStorage();
 
 // 편의 함수들 (기존 API 호환성 유지)
+// 주의: 이 함수들은 localStorage를 사용합니다. 서버 저장을 원하면 apiClient를 사용하세요.
 export const createProject = (blocks: Block[], theme: GlobalTheme): string => {
-  return projectStorage.create(blocks, theme);
+  const result = projectStorage.create(blocks, theme);
+  // LocalStorageProjectStorage는 동기 함수를 반환하므로 타입 단언
+  return typeof result === 'string' ? result : result as unknown as string;
 };
 
 export const updateProject = (id: string, blocks: Block[], theme: GlobalTheme): void => {
-  projectStorage.update(id, blocks, theme);
+  const result = projectStorage.update(id, blocks, theme);
+  // LocalStorageProjectStorage는 동기 함수를 반환하므로 void
+  if (result instanceof Promise) {
+    throw new Error('updateProject는 동기 함수여야 합니다. apiClient.updateProject를 사용하세요.');
+  }
 };
 
 export const loadProject = (id: string): ProjectData | null => {
-  return projectStorage.load(id);
+  const result = projectStorage.load(id);
+  // LocalStorageProjectStorage는 동기 함수를 반환하므로 타입 단언
+  return result instanceof Promise ? null : result;
 };
 
 export const projectExists = (id: string): boolean => {
-  return projectStorage.exists(id);
+  const result = projectStorage.exists(id);
+  // LocalStorageProjectStorage는 동기 함수를 반환하므로 타입 단언
+  return result instanceof Promise ? false : result;
 };
 
 // 하위 호환성을 위한 함수 (deprecated)
