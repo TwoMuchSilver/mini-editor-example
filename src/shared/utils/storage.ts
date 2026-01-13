@@ -7,10 +7,10 @@ export interface ProjectData {
 
 // Storage 인터페이스 (나중에 DB로 교체 가능)
 export interface ProjectStorage {
-  create(blocks: Block[], theme: GlobalTheme): string;
-  update(id: string, blocks: Block[], theme: GlobalTheme): void;
-  load(id: string): ProjectData | null;
-  exists(id: string): boolean;
+  create(blocks: Block[], theme: GlobalTheme): Promise<string> | string;
+  update(id: string, blocks: Block[], theme: GlobalTheme): Promise<void> | void;
+  load(id: string): Promise<ProjectData | null> | ProjectData | null;
+  exists(id: string): Promise<boolean> | boolean;
 }
 
 // 로컬스토리지 구현

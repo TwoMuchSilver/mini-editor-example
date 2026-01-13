@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation'; // URL의 id를 가져오는 훅
-import { loadProject } from '@/shared/utils/storage';
+import { loadProject } from '@/shared/utils/apiClient';
 import { Block, GlobalTheme } from '@/shared/types/block';
 import BlockRenderer from '@/shared/components/BlockRenderer';
 import DynamicMetaTags from '@/features/share/components/DynamicMetaTags';
@@ -20,15 +20,18 @@ export default function ViewerPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 1. 화면이 켜지면 가짜 DB에서 데이터를 가져옴
-    if (id) {
-      const projectData = loadProject(id);
-      if (projectData) {
-        setBlocks(projectData.blocks);
-        setTheme(projectData.theme);
+    // 1. 화면이 켜지면 API에서 데이터를 가져옴
+    async function fetchProject() {
+      if (id) {
+        const projectData = await loadProject(id);
+        if (projectData) {
+          setBlocks(projectData.blocks);
+          setTheme(projectData.theme);
+        }
+        setLoading(false);
       }
-      setLoading(false);
     }
+    fetchProject();
   }, [id]);
 
   if (loading) return <div className="text-center p-10">로딩 중...</div>;

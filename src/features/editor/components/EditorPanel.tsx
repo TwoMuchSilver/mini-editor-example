@@ -7,7 +7,7 @@ import { DndContext, closestCenter } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useBlockStore } from '@/store/useBlockStore';
 import SortableItem from './SortableItem';
-import { updateProject, createProject, projectExists } from '@/shared/utils/storage';
+import { updateProject, createProject, projectExists } from '@/shared/utils/apiClient';
 import ShareModal from '@/features/share/components/ShareModal';
 import TemplateSelector from '@/features/wedding/components/TemplateSelector';
 import { useDragAndDrop } from '../hooks/useDragAndDrop';
@@ -29,24 +29,29 @@ export default function EditorPanel({ projectId }: EditorPanelProps = {}) {
   const { handleDragEnd } = useDragAndDrop(blocks, useBlockStore.getState().setBlocks);
 
   // 저장 버튼 클릭 시
-  const handleSave = () => {
-    let currentProjectId = projectId;
-    
-    // 프로젝트 ID가 없거나 존재하지 않으면 새로 생성
-    if (!currentProjectId || !projectExists(currentProjectId)) {
-      currentProjectId = createProject(blocks, theme);
-      // 새 프로젝트 생성 시 편집 페이지로 리다이렉트
-      router.push(`/${currentProjectId}/edit`);
-    } else {
-      // 기존 프로젝트 업데이트
-      updateProject(currentProjectId, blocks, theme);
+  const handleSave = async () => {
+    try {
+      let currentProjectId = projectId;
+      
+      // 프로젝트 ID가 없거나 존재하지 않으면 새로 생성
+      if (!currentProjectId || !(await projectExists(currentProjectId))) {
+        currentProjectId = await createProject(blocks, theme);
+        // 새 프로젝트 생성 시 편집 페이지로 리다이렉트
+        router.push(`/${currentProjectId}/edit`);
+      } else {
+        // 기존 프로젝트 업데이트
+        await updateProject(currentProjectId, blocks, theme);
+      }
+      
+      // Phase 2 요구사항: /[projectId]/view 라우팅 사용
+      const url = `${window.location.origin}/${currentProjectId}/view`;
+      
+      setShareUrl(url);
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error('저장 오류:', error);
+      alert('저장에 실패했습니다. 다시 시도해주세요.');
     }
-    
-    // Phase 2 요구사항: /[projectId]/view 라우팅 사용
-    const url = `${window.location.origin}/${currentProjectId}/view`;
-    
-    setShareUrl(url);
-    setIsModalOpen(true);
   };
 
   return (

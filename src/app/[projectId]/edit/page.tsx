@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation';
 import BlockRenderer from "@/shared/components/BlockRenderer";
 import EditorPanel from "@/features/editor/components/EditorPanel";
 import { useBlockStore } from "@/store/useBlockStore";
-import { loadProject } from '@/shared/utils/storage';
+import { loadProject } from '@/shared/utils/apiClient';
 
 export default function EditorPage() {
   const params = useParams();
@@ -15,13 +15,16 @@ export default function EditorPage() {
 
   // 프로젝트 ID가 있으면 기존 프로젝트 로드
   useEffect(() => {
-    if (projectId) {
-      const projectData = loadProject(projectId);
-      if (projectData) {
-        setBlocks(projectData.blocks);
-        setTheme(projectData.theme);
+    async function fetchProject() {
+      if (projectId) {
+        const projectData = await loadProject(projectId);
+        if (projectData) {
+          setBlocks(projectData.blocks);
+          setTheme(projectData.theme);
+        }
       }
     }
+    fetchProject();
   }, [projectId, setBlocks, setTheme]);
 
   return (
