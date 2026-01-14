@@ -1,5 +1,5 @@
 // features/wedding/templates/presets.ts
-import { Block, CoupleInfo, WeddingDate, VenueInfo, MapInfo, GlobalTheme } from "@/shared/types/block";
+import { Block, CoupleInfo, WeddingDate, MapInfo, AccountInfo, GlobalTheme } from "@/shared/types/block";
 
 // 테마 정의
 export const THEME_SIMPLE: GlobalTheme = {
@@ -52,6 +52,12 @@ export const PRESET_SIMPLE: Block[] = [
     content: '' 
   },
   { 
+    id: 'simple-7', 
+    type: 'text', 
+    content: '소중한 날에 초대합니다', 
+    styles: { align: 'center', fontSize: '16px', color: '#666' } 
+  },
+  { 
     id: 'simple-4', 
     type: 'date', 
     content: { 
@@ -60,15 +66,6 @@ export const PRESET_SIMPLE: Block[] = [
       day: '', 
       time: '' 
     } as WeddingDate
-  },
-  { 
-    id: 'simple-5', 
-    type: 'venue', 
-    content: { 
-      name: '', 
-      hall: '', 
-      address: '' 
-    } as VenueInfo
   },
   { 
     id: 'simple-6', 
@@ -81,10 +78,22 @@ export const PRESET_SIMPLE: Block[] = [
     } as MapInfo
   },
   { 
-    id: 'simple-7', 
-    type: 'text', 
-    content: '소중한 날에 초대합니다', 
-    styles: { align: 'center', fontSize: '16px', color: '#666' } 
+    id: 'simple-5', 
+    type: 'account', 
+    content: {
+      groomAccount: '',
+      groomAccountVisible: true,
+      groomFatherAccount: '',
+      groomFatherAccountVisible: true,
+      groomMotherAccount: '',
+      groomMotherAccountVisible: true,
+      brideAccount: '',
+      brideAccountVisible: true,
+      brideFatherAccount: '',
+      brideFatherAccountVisible: true,
+      brideMotherAccount: '',
+      brideMotherAccountVisible: true,
+    } as AccountInfo
   },
 ];
 
@@ -124,15 +133,6 @@ export const PRESET_PHOTO: Block[] = [
     } as WeddingDate
   },
   { 
-    id: 'photo-5', 
-    type: 'venue', 
-    content: { 
-      name: '', 
-      hall: '', 
-      address: '' 
-    } as VenueInfo
-  },
-  { 
     id: 'photo-6', 
     type: 'map', 
     content: { 
@@ -141,6 +141,24 @@ export const PRESET_PHOTO: Block[] = [
       latitude: undefined, 
       longitude: undefined 
     } as MapInfo
+  },
+  { 
+    id: 'photo-5', 
+    type: 'account', 
+    content: {
+      groomAccount: '',
+      groomAccountVisible: true,
+      groomFatherAccount: '',
+      groomFatherAccountVisible: true,
+      groomMotherAccount: '',
+      groomMotherAccountVisible: true,
+      brideAccount: '',
+      brideAccountVisible: true,
+      brideFatherAccount: '',
+      brideFatherAccountVisible: true,
+      brideMotherAccount: '',
+      brideMotherAccountVisible: true,
+    } as AccountInfo
   },
 ];
 
@@ -157,6 +175,11 @@ export const PRESET_CLASSIC: Block[] = [
     type: 'text', 
     content: '두 사람이 사랑으로 하나되는 날\n함께 자리하시어 축복해 주시면 감사하겠습니다', 
     styles: { align: 'center', fontSize: '14px', color: '#666' } 
+  },
+  { 
+    id: 'classic-7', 
+    type: 'image', 
+    content: '' 
   },
   { 
     id: 'classic-3', 
@@ -181,15 +204,6 @@ export const PRESET_CLASSIC: Block[] = [
     } as WeddingDate
   },
   { 
-    id: 'classic-5', 
-    type: 'venue', 
-    content: { 
-      name: '', 
-      hall: '', 
-      address: '' 
-    } as VenueInfo
-  },
-  { 
     id: 'classic-6', 
     type: 'map', 
     content: { 
@@ -200,9 +214,22 @@ export const PRESET_CLASSIC: Block[] = [
     } as MapInfo
   },
   { 
-    id: 'classic-7', 
-    type: 'image', 
-    content: '' 
+    id: 'classic-5', 
+    type: 'account', 
+    content: {
+      groomAccount: '',
+      groomAccountVisible: true,
+      groomFatherAccount: '',
+      groomFatherAccountVisible: true,
+      groomMotherAccount: '',
+      groomMotherAccountVisible: true,
+      brideAccount: '',
+      brideAccountVisible: true,
+      brideFatherAccount: '',
+      brideFatherAccountVisible: true,
+      brideMotherAccount: '',
+      brideMotherAccountVisible: true,
+    } as AccountInfo
   },
 ];
 
@@ -231,15 +258,6 @@ export const PRESET_MINIMAL: Block[] = [
     } as WeddingDate
   },
   { 
-    id: 'minimal-3', 
-    type: 'venue', 
-    content: { 
-      name: '', 
-      hall: '', 
-      address: '' 
-    } as VenueInfo
-  },
-  { 
     id: 'minimal-4', 
     type: 'map', 
     content: { 
@@ -248,6 +266,24 @@ export const PRESET_MINIMAL: Block[] = [
       latitude: undefined, 
       longitude: undefined 
     } as MapInfo
+  },
+  { 
+    id: 'minimal-3', 
+    type: 'account', 
+    content: {
+      groomAccount: '',
+      groomAccountVisible: true,
+      groomFatherAccount: '',
+      groomFatherAccountVisible: true,
+      groomMotherAccount: '',
+      groomMotherAccountVisible: true,
+      brideAccount: '',
+      brideAccountVisible: true,
+      brideFatherAccount: '',
+      brideFatherAccountVisible: true,
+      brideMotherAccount: '',
+      brideMotherAccountVisible: true,
+    } as AccountInfo
   },
 ];
 
@@ -258,4 +294,67 @@ export const TEMPLATES = [
   { id: 'classic', name: '클래식', description: '정중하고 격식있는 느낌', data: PRESET_CLASSIC, theme: THEME_CLASSIC },
   { id: 'minimal', name: '미니멀', description: '꼭 필요한 것만 담은 간결함', data: PRESET_MINIMAL, theme: THEME_MINIMAL },
 ];
+
+// 6. 블록 타입별 기본 content 생성 헬퍼 함수
+import { BlockType } from '@/shared/types/block';
+
+export function createDefaultBlockContent(type: BlockType): Block['content'] {
+  switch (type) {
+    case 'text':
+      return '';
+    case 'image':
+      return '';
+    case 'couple_info':
+      return {
+        groomName: '',
+        groomFather: '',
+        groomMother: '',
+        brideName: '',
+        brideFather: '',
+        brideMother: ''
+      } as CoupleInfo;
+    case 'date':
+      return {
+        year: '',
+        month: '',
+        day: '',
+        time: ''
+      } as WeddingDate;
+    case 'map':
+      return {
+        placeName: '',
+        address: '',
+        detailAddress: '',
+        latitude: undefined,
+        longitude: undefined
+      } as MapInfo;
+    case 'account':
+      return {
+        groomAccount: '',
+        groomAccountVisible: true,
+        groomFatherAccount: '',
+        groomFatherAccountVisible: true,
+        groomMotherAccount: '',
+        groomMotherAccountVisible: true,
+        brideAccount: '',
+        brideAccountVisible: true,
+        brideFatherAccount: '',
+        brideFatherAccountVisible: true,
+        brideMotherAccount: '',
+        brideMotherAccountVisible: true,
+      } as AccountInfo;
+    default:
+      return '';
+  }
+}
+
+// 블록 타입별 한글 이름
+export const BLOCK_TYPE_NAMES: Record<BlockType, string> = {
+  text: '텍스트',
+  image: '이미지',
+  couple_info: '신랑신부 정보',
+  date: '날짜',
+  map: '지도',
+  account: '계좌번호',
+};
 

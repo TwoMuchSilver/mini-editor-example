@@ -12,8 +12,9 @@ import ShareModal from '@/features/share/components/ShareModal';
 import TemplateSelector from '@/features/wedding/components/TemplateSelector';
 import { useDragAndDrop } from '../hooks/useDragAndDrop';
 import { useBlockManagement } from '../hooks/useBlockManagement';
-import { CoupleInfo, WeddingDate, VenueInfo, MapInfo } from '@/shared/types/block';
+import { CoupleInfo, WeddingDate, MapInfo, AccountInfo, BlockType } from '@/shared/types/block';
 import MapBlockEditor from './MapBlockEditor';
+import { createDefaultBlockContent, BLOCK_TYPE_NAMES } from '@/features/wedding/templates/presets';
 
 interface EditorPanelProps {
   projectId?: string;
@@ -35,14 +36,33 @@ export default function EditorPanel({ projectId: propProjectId }: EditorPanelPro
   
   const projectId = getProjectIdFromUrl();
   const { theme } = useBlockStore();
-  const { blocks, updateBlock } = useBlockManagement();
+  const { blocks, updateBlock, addBlock, deleteBlock } = useBlockManagement();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
   const [uploadingImages, setUploadingImages] = useState<Set<string>>(new Set());
   const [isSaving, setIsSaving] = useState(false);
+  const [showAddBlockMenu, setShowAddBlockMenu] = useState(false);
 
   // Drag and Drop 로직 (Hook으로 분리)
   const { handleDragEnd } = useDragAndDrop(blocks, useBlockStore.getState().setBlocks);
+
+  // 블록 추가 핸들러
+  const handleAddBlock = (type: BlockType) => {
+    const newBlock = {
+      id: `${type}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      type,
+      content: createDefaultBlockContent(type),
+    };
+    addBlock(newBlock);
+    setShowAddBlockMenu(false);
+  };
+
+  // 블록 삭제 핸들러
+  const handleDeleteBlock = (id: string) => {
+    if (confirm('이 블록을 삭제하시겠습니까?')) {
+      deleteBlock(id);
+    }
+  };
 
   // 저장 버튼 클릭 시
   const handleSave = async () => {
@@ -90,6 +110,7 @@ export default function EditorPanel({ projectId: propProjectId }: EditorPanelPro
         window.history.replaceState(null, '', `/${currentProjectId}/edit`);
       }
     } catch (error) {
+      console.error('저장 오류:', error);
       alert('저장에 실패했습니다. 다시 시도해주세요.');
     } finally {
       setIsSaving(false);
@@ -108,7 +129,7 @@ export default function EditorPanel({ projectId: propProjectId }: EditorPanelPro
         <button 
           onClick={handleSave}
           disabled={isSaving}
-          className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 font-semibold shadow-md hover:shadow-lg transition-all duration-200 disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full bg-blue-400 text-white px-4 py-3 rounded-lg hover:bg-blue-700 font-semibold shadow-md hover:shadow-lg transition-all duration-200 disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {isSaving ? (
             <>
@@ -123,6 +144,40 @@ export default function EditorPanel({ projectId: propProjectId }: EditorPanelPro
           )}
         </button>
       </div>
+
+      {/* 블록 추가 버튼 */}
+      <div className="mb-4 relative">
+        <button
+          onClick={() => setShowAddBlockMenu(!showAddBlockMenu)}
+          className="w-full bg-blue-400 text-white px-4 py-2 rounded-lg hover:bg-green-700 font-semibold shadow-md transition-all duration-200 flex items-center justify-center gap-2"
+        >
+          <span> + </span>
+          <span>요소 추가</span>
+        </button>
+        
+        {/* 블록 타입 선택 메뉴 */}
+        {showAddBlockMenu && (
+          <>
+            <div 
+              className="fixed inset-0 z-10" 
+              onClick={() => setShowAddBlockMenu(false)}
+            />
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white border rounded-lg shadow-lg z-20 overflow-hidden">
+              {(Object.keys(BLOCK_TYPE_NAMES) as BlockType[]).map((type) => (
+                <button
+                  key={type}
+                  onClick={() => handleAddBlock(type)}
+                  className="w-full text-left px-4 py-3 hover:bg-gray-50 border-b last:border-b-0 transition-colors"
+                >
+                  <span className="text-sm font-medium text-gray-800">
+                    {BLOCK_TYPE_NAMES[type]}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
       {/* 1. DnD 컨텍스트 시작 : 이 태그 안은 물리법칙(드래그)가 적용됨 */}
       <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           
@@ -134,7 +189,7 @@ export default function EditorPanel({ projectId: propProjectId }: EditorPanelPro
               if (block.type === 'text') {
                 const textContent = typeof block.content === 'string' ? block.content : '';
                 return (
-                  <SortableItem key={block.id} id={block.id}>
+                  <SortableItem key={block.id} id={block.id} onDelete={() => handleDeleteBlock(block.id)}>
                     <div className="flex flex-col gap-2">
                       <span className="text-xs font-bold text-gray-500 uppercase">{block.type} BLOCK</span>
                       <textarea
@@ -191,7 +246,7 @@ export default function EditorPanel({ projectId: propProjectId }: EditorPanelPro
                   }
                 };
                 return (
-                  <SortableItem key={block.id} id={block.id}>
+                  <SortableItem key={block.id} id={block.id} onDelete={() => handleDeleteBlock(block.id)}>
                     <div className="flex flex-col gap-2">
                       <span className="text-xs font-bold text-gray-500 uppercase">{block.type} BLOCK</span>
                       <div className="flex flex-col gap-3">
@@ -233,7 +288,7 @@ export default function EditorPanel({ projectId: propProjectId }: EditorPanelPro
                             ) : (
                               <>
                                 <span className="text-2xl">📁</span>
-                                <span className="text-sm font-medium text-blue-600">
+                                <span className="text-sm font-medium text-blue-400">
                                   이미지 파일 선택
                                 </span>
                               </>
@@ -279,7 +334,7 @@ export default function EditorPanel({ projectId: propProjectId }: EditorPanelPro
                 };
 
                 return (
-                  <SortableItem key={block.id} id={block.id}>
+                  <SortableItem key={block.id} id={block.id} onDelete={() => handleDeleteBlock(block.id)}>
                     <div className="flex flex-col gap-2">
                       <span className="text-xs font-bold text-gray-500 uppercase">{block.type} BLOCK</span>
                       <div className="grid grid-cols-2 gap-2">
@@ -345,7 +400,7 @@ export default function EditorPanel({ projectId: propProjectId }: EditorPanelPro
                 };
 
                 return (
-                  <SortableItem key={block.id} id={block.id}>
+                  <SortableItem key={block.id} id={block.id} onDelete={() => handleDeleteBlock(block.id)}>
                     <div className="flex flex-col gap-2">
                       <span className="text-xs font-bold text-gray-500 uppercase">{block.type} BLOCK</span>
                       <div className="flex gap-2">
@@ -385,54 +440,6 @@ export default function EditorPanel({ projectId: propProjectId }: EditorPanelPro
                 );
               }
 
-              // VENUE BLOCK
-              if (block.type === 'venue') {
-                const venueInfo = typeof block.content !== 'string' && 'name' in block.content
-                  ? block.content as VenueInfo
-                  : { name: '', address: '', hall: '' };
-                
-                const handleVenueChange = (field: keyof VenueInfo) => (
-                  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-                ) => {
-                  updateBlock(block.id, {
-                    ...venueInfo,
-                    [field]: e.target.value,
-                  });
-                };
-
-                return (
-                  <SortableItem key={block.id} id={block.id}>
-                    <div className="flex flex-col gap-2">
-                      <span className="text-xs font-bold text-gray-500 uppercase">{block.type} BLOCK</span>
-                      <div className="flex flex-col gap-2">
-                        <div className="flex flex-col">
-                          <input
-                            value={venueInfo.name}
-                            onChange={handleVenueChange('name')}
-                            className="border rounded p-2 text-sm"
-                            placeholder="예식장 이름"
-                          />
-                        </div>
-                        <input
-                          value={venueInfo.hall || ''}
-                          onChange={handleVenueChange('hall')}
-                          className="border rounded p-2 text-sm"
-                          placeholder="홀 이름 (선택)"
-                        />
-                        <div className="flex flex-col">
-                          <textarea
-                            value={venueInfo.address}
-                            onChange={handleVenueChange('address')}
-                            className="border rounded p-2 text-sm"
-                            rows={2}
-                            placeholder="주소"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </SortableItem>
-                );
-              }
 
               // MAP BLOCK
               if (block.type === 'map') {
@@ -441,13 +448,180 @@ export default function EditorPanel({ projectId: propProjectId }: EditorPanelPro
                   : { placeName: '', address: '', latitude: undefined, longitude: undefined };
 
                 return (
-                  <SortableItem key={block.id} id={block.id}>
+                  <SortableItem key={block.id} id={block.id} onDelete={() => handleDeleteBlock(block.id)}>
                     <div className="flex flex-col gap-2">
                       <span className="text-xs font-bold text-gray-500 uppercase">{block.type} BLOCK</span>
                       <MapBlockEditor
                         mapInfo={mapInfo}
                         onUpdate={(info) => updateBlock(block.id, info)}
                       />
+                    </div>
+                  </SortableItem>
+                );
+              }
+
+              // ACCOUNT BLOCK
+              if (block.type === 'account') {
+                const accountInfo = typeof block.content !== 'string' && 'groomAccount' in (block.content || {})
+                  ? block.content as AccountInfo
+                  : {
+                      groomAccount: '',
+                      groomAccountVisible: true,
+                      groomFatherAccount: '',
+                      groomFatherAccountVisible: true,
+                      groomMotherAccount: '',
+                      groomMotherAccountVisible: true,
+                      brideAccount: '',
+                      brideAccountVisible: true,
+                      brideFatherAccount: '',
+                      brideFatherAccountVisible: true,
+                      brideMotherAccount: '',
+                      brideMotherAccountVisible: true,
+                    };
+
+                const handleAccountChange = (field: keyof AccountInfo) => (
+                  e: React.ChangeEvent<HTMLInputElement>
+                ) => {
+                  const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+                  updateBlock(block.id, {
+                    ...accountInfo,
+                    [field]: value,
+                  });
+                };
+
+                return (
+                  <SortableItem key={block.id} id={block.id} onDelete={() => handleDeleteBlock(block.id)}>
+                    <div className="flex flex-col gap-2">
+                      <span className="text-xs font-bold text-gray-500 uppercase">{block.type} BLOCK</span>
+                      <div className="space-y-4">
+                        {/* 신랑측 계좌번호 */}
+                        <div className="border border-gray-200 rounded-lg p-3 bg-gray-50">
+                          <h4 className="text-sm font-semibold text-gray-700 mb-3">신랑측</h4>
+                          <div className="space-y-3">
+                            <div className="flex flex-col gap-2">
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  checked={accountInfo.groomAccountVisible ?? true}
+                                  onChange={handleAccountChange('groomAccountVisible')}
+                                  className="w-4 h-4"
+                                />
+                                <label className="text-xs font-medium text-gray-600">신랑</label>
+                              </div>
+                              <input
+                                type="text"
+                                value={accountInfo.groomAccount || ''}
+                                onChange={handleAccountChange('groomAccount')}
+                                className="w-full border rounded p-2 text-sm"
+                                placeholder="계좌번호 입력"
+                                disabled={!accountInfo.groomAccountVisible}
+                              />
+                            </div>
+                            <div className="flex flex-col gap-2">
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  checked={accountInfo.groomFatherAccountVisible ?? true}
+                                  onChange={handleAccountChange('groomFatherAccountVisible')}
+                                  className="w-4 h-4"
+                                />
+                                <label className="text-xs font-medium text-gray-600">신랑 아버지</label>
+                              </div>
+                              <input
+                                type="text"
+                                value={accountInfo.groomFatherAccount || ''}
+                                onChange={handleAccountChange('groomFatherAccount')}
+                                className="w-full border rounded p-2 text-sm"
+                                placeholder="계좌번호 입력"
+                                disabled={!accountInfo.groomFatherAccountVisible}
+                              />
+                            </div>
+                            <div className="flex flex-col gap-2">
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  checked={accountInfo.groomMotherAccountVisible ?? true}
+                                  onChange={handleAccountChange('groomMotherAccountVisible')}
+                                  className="w-4 h-4"
+                                />
+                                <label className="text-xs font-medium text-gray-600">신랑 어머니</label>
+                              </div>
+                              <input
+                                type="text"
+                                value={accountInfo.groomMotherAccount || ''}
+                                onChange={handleAccountChange('groomMotherAccount')}
+                                className="w-full border rounded p-2 text-sm"
+                                placeholder="계좌번호 입력"
+                                disabled={!accountInfo.groomMotherAccountVisible}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 신부측 계좌번호 */}
+                        <div className="border border-gray-200 rounded-lg p-3 bg-gray-50">
+                          <h4 className="text-sm font-semibold text-gray-700 mb-3">신부측</h4>
+                          <div className="space-y-3">
+                            <div className="flex flex-col gap-2">
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  checked={accountInfo.brideAccountVisible ?? true}
+                                  onChange={handleAccountChange('brideAccountVisible')}
+                                  className="w-4 h-4"
+                                />
+                                <label className="text-xs font-medium text-gray-600">신부</label>
+                              </div>
+                              <input
+                                type="text"
+                                value={accountInfo.brideAccount || ''}
+                                onChange={handleAccountChange('brideAccount')}
+                                className="w-full border rounded p-2 text-sm"
+                                placeholder="계좌번호 입력"
+                                disabled={!accountInfo.brideAccountVisible}
+                              />
+                            </div>
+                            <div className="flex flex-col gap-2">
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  checked={accountInfo.brideFatherAccountVisible ?? true}
+                                  onChange={handleAccountChange('brideFatherAccountVisible')}
+                                  className="w-4 h-4"
+                                />
+                                <label className="text-xs font-medium text-gray-600">신부 아버지</label>
+                              </div>
+                              <input
+                                type="text"
+                                value={accountInfo.brideFatherAccount || ''}
+                                onChange={handleAccountChange('brideFatherAccount')}
+                                className="w-full border rounded p-2 text-sm"
+                                placeholder="계좌번호 입력"
+                                disabled={!accountInfo.brideFatherAccountVisible}
+                              />
+                            </div>
+                            <div className="flex flex-col gap-2">
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  checked={accountInfo.brideMotherAccountVisible ?? true}
+                                  onChange={handleAccountChange('brideMotherAccountVisible')}
+                                  className="w-4 h-4"
+                                />
+                                <label className="text-xs font-medium text-gray-600">신부 어머니</label>
+                              </div>
+                              <input
+                                type="text"
+                                value={accountInfo.brideMotherAccount || ''}
+                                onChange={handleAccountChange('brideMotherAccount')}
+                                className="w-full border rounded p-2 text-sm"
+                                placeholder="계좌번호 입력"
+                                disabled={!accountInfo.brideMotherAccountVisible}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </SortableItem>
                 );
