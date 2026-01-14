@@ -31,7 +31,7 @@ export default function EditorPage() {
   return (
     <main className="h-screen flex overflow-hidden">
       {/* 왼쪽: 에디터 패널 */}
-      <div className="border-r border-gray-300 bg-white">
+      <div className="border-r border-gray-300 bg-white flex-shrink-0 overflow-hidden">
         <EditorPanel projectId={projectId} />
       </div>
 

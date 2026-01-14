@@ -79,7 +79,7 @@ export default function MapBlockEditor({ mapInfo, onUpdate }: MapBlockEditorProp
   return (
     <div className="flex flex-col gap-2">
       {/* 장소 검색 */}
-      <div className="flex flex-col">
+      <div className="flex flex-col relative">
         <label className="block text-xs font-semibold text-gray-600 mb-1">
           장소 검색 *
         </label>
@@ -115,9 +115,9 @@ export default function MapBlockEditor({ mapInfo, onUpdate }: MapBlockEditorProp
           </button>
         </div>
         
-        {/* 검색 결과 */}
+        {/* 검색 결과 - absolute positioning으로 레이아웃에 영향 없도록 */}
         {showResults && searchResults.length > 0 && (
-          <div className="mt-2 border rounded max-h-60 overflow-y-auto">
+          <div className="absolute top-full left-0 right-0 mt-2 z-10 bg-white border rounded shadow-lg max-h-60 overflow-y-auto">
             {searchResults.map((place) => (
               <button
                 key={place.id}
@@ -141,7 +141,7 @@ export default function MapBlockEditor({ mapInfo, onUpdate }: MapBlockEditorProp
         )}
         
         {showResults && searchResults.length === 0 && !isSearching && (
-          <div className="mt-2 text-xs text-gray-500 p-2 border rounded">
+          <div className="absolute top-full left-0 right-0 mt-2 z-10 text-xs text-gray-500 p-2 border rounded bg-white shadow-lg">
             검색 결과가 없습니다.
           </div>
         )}
