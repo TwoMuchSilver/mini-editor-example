@@ -16,9 +16,10 @@ export default function AccountBlock({ block }: Props) {
   const { groomAccounts, brideAccounts } = useAccountBlock(accountInfo);
   const [activeTab, setActiveTab] = useState<'groom' | 'bride'>('groom');
 
-  const handleKakaoPayTransfer = (account: string, label: string) => {
-    // TODO: 카카오페이 송금 로직 구현
-    console.log(`카카오페이 송금: ${label} - ${account}`);
+  const handleKakaoPayTransfer = (account: string | undefined, label: string) => {
+    if (!account) return;
+    // 카카오페이 코드송금 API가 현재 중단되어 있어 alert만 표시
+    alert(`일시적으로 카카오페이 코드송금 API 제휴가 중단되었습니다.\n\n${label} 계좌번호: ${account}\n\n시스템 개선 작업 완료 후 제휴가 재개될 예정입니다.`);
   };
 
   return (
@@ -71,7 +72,7 @@ export default function AccountBlock({ block }: Props) {
                       {item.account}
                     </span>
                     <button
-                      // onClick={() => handleKakaoPayTransfer(item.account, item.label)}
+                      onClick={() => item.account && handleKakaoPayTransfer(item.account, item.label)}
                       className="ml-3 px-2 py-1 bg-yellow-400 hover:bg-yellow-500 text-gray-900 rounded-lg text-xs transition-colors shadow-sm whitespace-nowrap"
                     >
                       카카오페이 송금
@@ -106,7 +107,7 @@ export default function AccountBlock({ block }: Props) {
                       {item.account}
                     </span>
                     <button
-                      // onClick={() => handleKakaoPayTransfer(item.account, item.label)}
+                      onClick={() => item.account && handleKakaoPayTransfer(item.account, item.label)}
                       className="ml-3 px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 rounded-lg font-semibold text-sm transition-colors shadow-sm whitespace-nowrap"
                     >
                       카카오페이 송금
