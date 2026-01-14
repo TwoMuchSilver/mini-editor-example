@@ -2,22 +2,19 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { createProject } from '@/shared/utils/apiClient';
 import { useBlockStore } from "@/store/useBlockStore";
 
 export default function Home() {
   const router = useRouter();
-  const { blocks, theme } = useBlockStore();
+  const { reset } = useBlockStore();
 
   // 새 프로젝트 생성 버튼 클릭 시
-  const handleCreateNew = async () => {
-    try {
-      const projectId = await createProject(blocks, theme);
-      router.push(`/${projectId}/edit`);
-    } catch (error) {
-      console.error('프로젝트 생성 오류:', error);
-      alert('프로젝트 생성에 실패했습니다. 다시 시도해주세요.');
-    }
+  const handleCreateNew = () => {
+    // store를 초기 상태로 리셋
+    reset();
+    // 임시 ID로 편집 페이지로 이동 (DB 저장은 하지 않음)
+    const tempId = 'new';
+    router.push(`/${tempId}/edit`);
   };
 
   return (

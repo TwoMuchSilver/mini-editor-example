@@ -13,16 +13,17 @@ export default function EditorPage() {
   const projectId = params.projectId as string;
   const { blocks, theme, setBlocks, setTheme } = useBlockStore();
 
-  // 프로젝트 ID가 있으면 기존 프로젝트 로드
+  // 프로젝트 ID가 있고 'new'가 아니면 기존 프로젝트 로드
   useEffect(() => {
     async function fetchProject() {
-      if (projectId) {
+      if (projectId && projectId !== 'new') {
         const projectData = await loadProject(projectId);
         if (projectData) {
           setBlocks(projectData.blocks);
           setTheme(projectData.theme);
         }
       }
+      // 'new'인 경우는 store의 초기 상태를 그대로 사용 (리셋된 상태)
     }
     fetchProject();
   }, [projectId, setBlocks, setTheme]);

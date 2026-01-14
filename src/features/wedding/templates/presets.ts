@@ -1,5 +1,5 @@
 // features/wedding/templates/presets.ts
-import { Block, CoupleInfo, WeddingDate, VenueInfo, GlobalTheme } from "@/shared/types/block";
+import { Block, CoupleInfo, WeddingDate, VenueInfo, MapInfo, GlobalTheme } from "@/shared/types/block";
 
 // 테마 정의
 export const THEME_SIMPLE: GlobalTheme = {
@@ -72,6 +72,16 @@ export const PRESET_SIMPLE: Block[] = [
   },
   { 
     id: 'simple-6', 
+    type: 'map', 
+    content: { 
+      placeName: '', 
+      address: '', 
+      latitude: undefined, 
+      longitude: undefined 
+    } as MapInfo
+  },
+  { 
+    id: 'simple-7', 
     type: 'text', 
     content: '소중한 날에 초대합니다', 
     styles: { align: 'center', fontSize: '16px', color: '#666' } 
@@ -122,6 +132,16 @@ export const PRESET_PHOTO: Block[] = [
       address: '' 
     } as VenueInfo
   },
+  { 
+    id: 'photo-6', 
+    type: 'map', 
+    content: { 
+      placeName: '', 
+      address: '', 
+      latitude: undefined, 
+      longitude: undefined 
+    } as MapInfo
+  },
 ];
 
 // 3. 클래식 전통 (정중한 느낌)
@@ -171,6 +191,16 @@ export const PRESET_CLASSIC: Block[] = [
   },
   { 
     id: 'classic-6', 
+    type: 'map', 
+    content: { 
+      placeName: '', 
+      address: '', 
+      latitude: undefined, 
+      longitude: undefined 
+    } as MapInfo
+  },
+  { 
+    id: 'classic-7', 
     type: 'image', 
     content: '' 
   },
@@ -208,6 +238,16 @@ export const PRESET_MINIMAL: Block[] = [
       hall: '', 
       address: '' 
     } as VenueInfo
+  },
+  { 
+    id: 'minimal-4', 
+    type: 'map', 
+    content: { 
+      placeName: '', 
+      address: '', 
+      latitude: undefined, 
+      longitude: undefined 
+    } as MapInfo
   },
 ];
 

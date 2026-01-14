@@ -1,57 +1,22 @@
 // store/useBlockStore.ts
 import { create } from 'zustand';
-import { Block, CoupleInfo, WeddingDate, VenueInfo, GlobalTheme } from '@/shared/types/block';
+import { Block, GlobalTheme } from '@/shared/types/block';
+import { PRESET_SIMPLE, THEME_SIMPLE } from '@/features/wedding/templates/presets';
 
-// 초기 데이터 (빈 placeholder로 시작)
-const INITIAL_BLOCKS: Block[] = [
-  { id: 'b1', type: 'image', content: '' },
-  { 
-    id: 'b2', 
-    type: 'couple_info', 
-    content: {
-      groomName: '',
-      groomFather: '',
-      groomMother: '',
-      brideName: '',
-      brideFather: '',
-      brideMother: ''
-    } as CoupleInfo
-  },
-  { 
-    id: 'b3', 
-    type: 'date', 
-    content: {
-      year: '',
-      month: '',
-      day: '',
-      time: ''
-    } as WeddingDate
-  },
-  {
-    id: 'b4',
-    type: 'venue',
-    content: {
-      name: '',
-      hall: '',
-      address: ''
-    } as VenueInfo
-  },
-];
+// 초기 데이터: 모던 심플 템플릿 사용
+const INITIAL_BLOCKS: Block[] = JSON.parse(JSON.stringify(PRESET_SIMPLE));
 
 interface BlockState {
   blocks: Block[];
   theme: GlobalTheme;
-  updateBlockContent: (id: string, newContent: string | CoupleInfo | WeddingDate | VenueInfo) => void;
+  updateBlockContent: (id: string, newContent: Block['content']) => void;
   setBlocks: (newBlocks: Block[]) => void; // 순서 변경용
   setTheme: (newTheme: GlobalTheme) => void; // 테마 변경용
+  reset: () => void; // 초기 상태로 리셋
 }
 
-// 기본 테마
-const DEFAULT_THEME: GlobalTheme = {
-  backgroundColor: '#ffffff',
-  fontFamily: 'system-ui, sans-serif',
-  primaryColor: '#6366f1',
-};
+// 기본 테마: 모던 심플 테마 사용
+const DEFAULT_THEME: GlobalTheme = THEME_SIMPLE;
 
 export const useBlockStore = create<BlockState>((set) => ({
   blocks: INITIAL_BLOCKS, // 실제(초기) 데이터
@@ -71,4 +36,10 @@ export const useBlockStore = create<BlockState>((set) => ({
 
   // 3. 테마 변경하기
   setTheme: (newTheme) => set({ theme: newTheme }),
+
+  // 4. 초기 상태로 리셋하기
+  reset: () => set({ 
+    blocks: JSON.parse(JSON.stringify(PRESET_SIMPLE)), 
+    theme: THEME_SIMPLE 
+  }),
 }));

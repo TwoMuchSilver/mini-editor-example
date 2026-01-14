@@ -1,0 +1,171 @@
+// features/editor/components/MapBlockEditor.tsx
+'use client';
+
+import { useState } from 'react';
+import { MapInfo } from '@/shared/types/block';
+
+interface MapBlockEditorProps {
+  mapInfo: MapInfo;
+  onUpdate: (info: MapInfo) => void;
+}
+
+interface PlaceResult {
+  id: string;
+  placeName: string;
+  address: string;
+  roadAddress: string;
+  phone: string;
+  categoryName: string;
+  x: string;
+  y: string;
+  placeUrl: string;
+}
+
+export default function MapBlockEditor({ mapInfo, onUpdate }: MapBlockEditorProps) {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<PlaceResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      setShowResults(false);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const response = await fetch(`/api/search/place?query=${encodeURIComponent(searchQuery)}`);
+      if (!response.ok) {
+        throw new Error('검색에 실패했습니다.');
+      }
+      const data = await response.json();
+      setSearchResults(data.places || []);
+      setShowResults(true);
+    } catch (error) {
+      console.error('장소 검색 오류:', error);
+      alert('장소 검색에 실패했습니다. 다시 시도해주세요.');
+      setSearchResults([]);
+      setShowResults(false);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleSelectPlace = (place: PlaceResult) => {
+    onUpdate({
+      placeName: place.placeName,
+      address: place.roadAddress || place.address,
+      latitude: parseFloat(place.y),
+      longitude: parseFloat(place.x),
+    });
+    setSearchQuery('');
+    setSearchResults([]);
+    setShowResults(false);
+  };
+
+  const handleClear = () => {
+    onUpdate({
+      placeName: '',
+      address: '',
+      latitude: undefined,
+      longitude: undefined,
+    });
+    setSearchQuery('');
+    setShowResults(false);
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      {/* 장소 검색 */}
+      <div className="flex flex-col">
+        <label className="block text-xs font-semibold text-gray-600 mb-1">
+          장소 검색 *
+        </label>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleSearch();
+              }
+            }}
+            className="flex-1 border rounded p-2 text-sm"
+            placeholder="예: 그랜드 웨딩홀, 서울특별시 강남구..."
+          />
+          <button
+            onClick={handleSearch}
+            disabled={isSearching || !searchQuery.trim()}
+            className="px-4 py-2 bg-gray-600 text-white rounded text-sm font-semibold hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
+          >
+            {isSearching ? (
+              <>
+                <span className="animate-spin">⏳</span>
+                <span>검색 중...</span>
+              </>
+            ) : (
+              <>
+                <span>🔍</span>
+                <span>검색</span>
+              </>
+            )}
+          </button>
+        </div>
+        
+        {/* 검색 결과 */}
+        {showResults && searchResults.length > 0 && (
+          <div className="mt-2 border rounded max-h-60 overflow-y-auto">
+            {searchResults.map((place) => (
+              <button
+                key={place.id}
+                onClick={() => handleSelectPlace(place)}
+                className="w-full text-left p-3 hover:bg-gray-50 border-b last:border-b-0 transition-colors"
+              >
+                <div className="font-semibold text-sm text-gray-800">
+                  {place.placeName}
+                </div>
+                <div className="text-xs text-gray-600 mt-1">
+                  {place.roadAddress || place.address}
+                </div>
+                {place.categoryName && (
+                  <div className="text-xs text-gray-500 mt-1">
+                    {place.categoryName}
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
+        
+        {showResults && searchResults.length === 0 && !isSearching && (
+          <div className="mt-2 text-xs text-gray-500 p-2 border rounded">
+            검색 결과가 없습니다.
+          </div>
+        )}
+      </div>
+
+      {/* 선택된 장소 정보 표시 */}
+      {mapInfo.placeName && (
+        <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded">
+          <div className="text-sm font-semibold text-gray-800 mb-1">
+            선택된 장소: {mapInfo.placeName}
+          </div>
+          {mapInfo.address && (
+            <div className="text-xs text-gray-600">
+              {mapInfo.address}
+            </div>
+          )}
+          <button
+            onClick={handleClear}
+            className="mt-2 text-xs text-red-600 hover:text-red-800"
+          >
+            선택 취소
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}

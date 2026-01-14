@@ -2,7 +2,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { DndContext, closestCenter } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useBlockStore } from '@/store/useBlockStore';
@@ -12,34 +11,37 @@ import ShareModal from '@/features/share/components/ShareModal';
 import TemplateSelector from '@/features/wedding/components/TemplateSelector';
 import { useDragAndDrop } from '../hooks/useDragAndDrop';
 import { useBlockManagement } from '../hooks/useBlockManagement';
-import { CoupleInfo, WeddingDate, VenueInfo } from '@/shared/types/block';
+import { CoupleInfo, WeddingDate, VenueInfo, MapInfo } from '@/shared/types/block';
+import MapBlockEditor from './MapBlockEditor';
 
 interface EditorPanelProps {
   projectId?: string;
 }
 
 export default function EditorPanel({ projectId }: EditorPanelProps = {}) {
-  const router = useRouter();
   const { theme } = useBlockStore();
   const { blocks, updateBlock } = useBlockManagement();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
   const [uploadingImages, setUploadingImages] = useState<Set<string>>(new Set());
+  const [isSaving, setIsSaving] = useState(false);
 
   // Drag and Drop 로직 (Hook으로 분리)
   const { handleDragEnd } = useDragAndDrop(blocks, useBlockStore.getState().setBlocks);
 
   // 저장 버튼 클릭 시
   const handleSave = async () => {
+    if (isSaving) return; // 이미 저장 중이면 무시
+    
+    setIsSaving(true);
     try {
-      let currentProjectId = projectId;
+      let currentProjectId: string = projectId || '';
+      const isNewProject = !currentProjectId || currentProjectId === 'new' || !(await projectExists(currentProjectId));
       
-      // 프로젝트 ID가 없거나 존재하지 않으면 새로 생성
-      if (!currentProjectId || !(await projectExists(currentProjectId))) {
+      if (isNewProject) {
+        // 새 프로젝트 생성
         currentProjectId = await createProject(blocks, theme);
-        // 새 프로젝트 생성 시 편집 페이지로 리다이렉트
-        router.push(`/${currentProjectId}/edit`);
-      } else {
+      } else if (currentProjectId) {
         // 기존 프로젝트 업데이트
         await updateProject(currentProjectId, blocks, theme);
       }
@@ -47,11 +49,20 @@ export default function EditorPanel({ projectId }: EditorPanelProps = {}) {
       // Phase 2 요구사항: /[projectId]/view 라우팅 사용
       const url = `${window.location.origin}/${currentProjectId}/view`;
       
+      // 모달 먼저 표시 (리다이렉트 전에)
       setShareUrl(url);
       setIsModalOpen(true);
+      
+      // 새 프로젝트인 경우 URL만 업데이트 (페이지 리로드 없이)
+      if (isNewProject) {
+        // URL만 변경하고 페이지 리로드는 하지 않음 (모달이 닫히지 않도록)
+        window.history.replaceState(null, '', `/${currentProjectId}/edit`);
+      }
     } catch (error) {
       console.error('저장 오류:', error);
       alert('저장에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -66,9 +77,20 @@ export default function EditorPanel({ projectId }: EditorPanelProps = {}) {
       <div className="mb-6">
         <button 
           onClick={handleSave}
-          className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 font-semibold shadow-md hover:shadow-lg transition-all duration-200"
+          disabled={isSaving}
+          className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 font-semibold shadow-md hover:shadow-lg transition-all duration-200 disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
-          💾 저장 & 공유하기
+          {isSaving ? (
+            <>
+              <span className="animate-spin">⏳</span>
+              <span>저장 중...</span>
+            </>
+          ) : (
+            <>
+              <span>💾</span>
+              <span>저장 & 공유하기</span>
+            </>
+          )}
         </button>
       </div>
       {/* 1. DnD 컨텍스트 시작 : 이 태그 안은 물리법칙(드래그)가 적용됨 */}
@@ -377,6 +399,25 @@ export default function EditorPanel({ projectId }: EditorPanelProps = {}) {
                           />
                         </div>
                       </div>
+                    </div>
+                  </SortableItem>
+                );
+              }
+
+              // MAP BLOCK
+              if (block.type === 'map') {
+                const mapInfo = typeof block.content !== 'string' && 'placeName' in block.content
+                  ? block.content as MapInfo
+                  : { placeName: '', address: '', latitude: undefined, longitude: undefined };
+
+                return (
+                  <SortableItem key={block.id} id={block.id}>
+                    <div className="flex flex-col gap-2">
+                      <span className="text-xs font-bold text-gray-500 uppercase">{block.type} BLOCK</span>
+                      <MapBlockEditor
+                        mapInfo={mapInfo}
+                        onUpdate={(info) => updateBlock(block.id, info)}
+                      />
                     </div>
                   </SortableItem>
                 );
