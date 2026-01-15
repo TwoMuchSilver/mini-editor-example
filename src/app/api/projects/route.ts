@@ -18,8 +18,8 @@ export async function POST(request: NextRequest) {
 
     const projectId = await serverStorage.create(blocks, theme, title);
     
-    // 새 프로젝트 생성 시 메인 페이지(리스트) 캐시 즉시 갱신
-    revalidatePath('/');
+    // 새 프로젝트 생성 시 대시보드 페이지 캐시 즉시 갱신
+    revalidatePath('/dashboard');
     
     return NextResponse.json({ 
       id: projectId,

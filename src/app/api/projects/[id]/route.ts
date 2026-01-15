@@ -91,8 +91,8 @@ export async function PUT(
       );
     }
 
-    // 프로젝트 업데이트 시 메인 페이지(리스트) 캐시 즉시 갱신 (제목 변경 등 반영)
-    revalidatePath('/');
+    // 프로젝트 업데이트 시 대시보드 페이지 캐시 즉시 갱신 (제목 변경 등 반영)
+    revalidatePath('/dashboard');
     
     return NextResponse.json({ 
       message: '프로젝트가 업데이트되었습니다.'
