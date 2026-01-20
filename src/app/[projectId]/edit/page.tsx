@@ -1,7 +1,6 @@
-// app/[projectId]/edit/page.tsx
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import BlockRenderer from "@/shared/components/BlockRenderer";
 import EditorPanel from "@/features/editor/components/EditorPanel";
@@ -11,25 +10,46 @@ import { loadProject } from '@/shared/utils/apiClient';
 export default function EditorPage() {
   const params = useParams();
   const projectId = params.projectId as string;
-  const { blocks, theme, setBlocks, setTheme, setTitle } = useBlockStore();
+  const { blocks, theme, setBlocks, setTheme, setTitle, reset } = useBlockStore();
+  const [isLoading, setIsLoading] = useState(true);
 
   // 프로젝트 ID가 있고 'new'가 아니면 기존 프로젝트 로드
   useEffect(() => {
     async function fetchProject() {
-      if (projectId && projectId !== 'new') {
-        const projectData = await loadProject(projectId);
-        if (projectData) {
-          setBlocks(projectData.blocks);
-          setTheme(projectData.theme);
-          if (projectData.title) {
-            setTitle(projectData.title);
+      setIsLoading(true);
+      try {
+        if (projectId && projectId !== 'new') {
+          const projectData = await loadProject(projectId);
+          if (projectData) {
+            setBlocks(projectData.blocks);
+            setTheme(projectData.theme);
+            if (projectData.title) {
+              setTitle(projectData.title);
+            }
           }
+        } else {
+          // 'new'인 경우는 store를 초기 상태로 리셋
+          reset();
         }
+      } catch (error) {
+        console.error("프로젝트 로드 실패:", error);
+      } finally {
+        setIsLoading(false);
       }
-      // 'new'인 경우는 store의 초기 상태를 그대로 사용 (리셋된 상태)
     }
     fetchProject();
-  }, [projectId, setBlocks, setTheme, setTitle]);
+  }, [projectId, setBlocks, setTheme, setTitle, reset]);
+
+  if (isLoading) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+          <p className="text-muted-foreground font-medium">청첩장 정보를 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <main className="h-screen flex flex-col md:flex-row bg-background">
