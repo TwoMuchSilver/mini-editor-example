@@ -1,7 +1,7 @@
 // features/editor/components/EditorPanel.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { GridSlotPreview } from './GridSlotPreview';
 import { useParams } from 'next/navigation';
 import { DndContext, closestCenter } from '@dnd-kit/core';
@@ -18,6 +18,8 @@ import MapBlockEditor from './MapBlockEditor';
 import { createDefaultBlockContent, BLOCK_TYPE_NAMES } from '@/features/wedding/templates/presets';
 import GridEditorModal from './GridEditorModal';
 import { GRID_TEMPLATES } from '@/features/wedding/templates/gridTemplates';
+import PremiumModal from '@/features/premium/components/PremiumModal';
+import { isPremiumProject, setPremiumProject } from '@/shared/utils/premiumStorage';
 
 interface EditorPanelProps {
   projectId?: string;
@@ -43,6 +45,17 @@ export default function EditorPanel({ projectId: propProjectId }: EditorPanelPro
   const [isSaving, setIsSaving] = useState(false);
   const [showAddBlockMenu, setShowAddBlockMenu] = useState(false);
   const [editingGridBlockId, setEditingGridBlockId] = useState<string | null>(null);
+  
+  // 프리미엄 상태 관리
+  const [isPremium, setIsPremium] = useState(false);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+
+  // 프리미엄 상태 확인
+  useEffect(() => {
+    if (projectId && projectId !== 'new') {
+      setIsPremium(isPremiumProject(projectId));
+    }
+  }, [projectId]);
 
   // Drag and Drop 로직 (Hook으로 분리)
   const { handleDragEnd } = useDragAndDrop(blocks, useBlockStore.getState().setBlocks);
@@ -65,9 +78,33 @@ export default function EditorPanel({ projectId: propProjectId }: EditorPanelPro
     }
   };
 
+  // 프리미엄 인증 성공 핸들러
+  const handlePremiumSuccess = (code: string) => {
+    if (projectId && projectId !== 'new') {
+      setPremiumProject(projectId, code);
+      setIsPremium(true);
+      setShowPremiumModal(false);
+      alert('🎉 프리미엄 기능이 활성화되었습니다!');
+    } else {
+      alert('⚠️ 먼저 프로젝트를 저장해주세요.');
+      setShowPremiumModal(false);
+    }
+  };
+
   // 저장 버튼 클릭 시
   const handleSave = async () => {
     if (isSaving) return; // 이미 저장 중이면 무시
+
+    // 프리미엄이 아니면 안내 모달 표시
+    if (!isPremium && projectId && projectId !== 'new') {
+      const confirmed = window.confirm(
+        '데모 버전에서는 워터마크가 표시됩니다.\n\n프리미엄 코드를 입력하시겠습니까?'
+      );
+      if (confirmed) {
+        setShowPremiumModal(true);
+        return;
+      }
+    }
     
     setIsSaving(true);
     try {
@@ -110,6 +147,9 @@ export default function EditorPanel({ projectId: propProjectId }: EditorPanelPro
       if (isNewProject) {
         // URL만 변경하고 페이지 리로드는 하지 않음 (모달이 닫히지 않도록)
         window.history.replaceState(null, '', `/${currentProjectId}/edit`);
+        
+        // 프리미엄 상태 다시 확인 (새 프로젝트 ID로)
+        setIsPremium(isPremiumProject(currentProjectId));
       }
     } catch (error) {
       console.error('저장 오류:', error);
@@ -147,6 +187,45 @@ export default function EditorPanel({ projectId: propProjectId }: EditorPanelPro
       
       {/* 템플릿 선택기 */}
       <TemplateSelector />
+      
+      {/* 프리미엄 상태 표시 */}
+      {projectId && projectId !== 'new' && (
+        <div className="mb-6">
+          {isPremium ? (
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
+              <span className="text-2xl">✨</span>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-green-800">
+                  프리미엄 활성화됨
+                </p>
+                <p className="text-xs text-green-600">
+                  워터마크 없이 저장 및 공유 가능합니다
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-2xl">🔒</span>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-yellow-800">
+                    데모 버전
+                  </p>
+                  <p className="text-xs text-yellow-600">
+                    워터마크가 표시됩니다
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowPremiumModal(true)}
+                className="w-full bg-yellow-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-yellow-600 transition-all text-sm"
+              >
+                프리미엄 코드 입력하기
+              </button>
+            </div>
+          )}
+        </div>
+      )}
       
       {/* 저장 버튼 */}
       <div className="mb-6">
@@ -880,6 +959,14 @@ export default function EditorPanel({ projectId: propProjectId }: EditorPanelPro
           onClose={() => setEditingGridBlockId(null)}
         />
       )}
+
+      {/* 프리미엄 모달 */}
+      <PremiumModal
+        isOpen={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        onSuccess={handlePremiumSuccess}
+        projectId={projectId}
+      />
     </div>
   );
 }

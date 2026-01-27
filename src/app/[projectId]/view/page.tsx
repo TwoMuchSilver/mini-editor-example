@@ -109,5 +109,5 @@ export default async function ViewerPage({ params }: PageProps) {
     notFound();
   }
 
-  return <ViewerContent blocks={projectData.blocks} theme={projectData.theme} />;
+  return <ViewerContent blocks={projectData.blocks} theme={projectData.theme} projectId={projectId} />;
 }

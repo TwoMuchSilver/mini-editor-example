@@ -4,13 +4,15 @@
 import { Block, GlobalTheme } from '@/shared/types/block';
 import BlockRenderer from '@/shared/components/BlockRenderer';
 import { LightboxProvider } from '@/features/wedding/components/LightboxProvider';
+import WatermarkWrapper from '@/features/premium/components/WatermarkWrapper';
 
 interface ViewerContentProps {
   blocks: Block[];
   theme: GlobalTheme;
+  projectId: string;
 }
 
-export default function ViewerContent({ blocks, theme }: ViewerContentProps) {
+export default function ViewerContent({ blocks, theme, projectId }: ViewerContentProps) {
   return (
     <main className="min-h-screen flex justify-center bg-gray-100/50">
       <div 
@@ -30,6 +32,9 @@ export default function ViewerContent({ blocks, theme }: ViewerContentProps) {
         {/* 하단 여백 */}
         <div className="h-20 shrink-0"></div>
       </div>
+
+      {/* 워터마크 (프리미엄이 아닌 경우 표시) */}
+      <WatermarkWrapper projectId={projectId} />
     </main>
   );
 }
