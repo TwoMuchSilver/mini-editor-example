@@ -71,8 +71,11 @@ export const PRESET_SIMPLE: Block[] = [
     id: 'simple-dday',
     type: 'dday',
     content: {
-      weddingDateTime: '',
-      title: '결혼식까지'
+      year: '',
+      month: '',
+      day: '',
+      hour: '',
+      minute: ''
     } as DDayContent
   },
   { 
@@ -154,8 +157,11 @@ export const PRESET_PHOTO: Block[] = [
     id: 'photo-dday',
     type: 'dday',
     content: {
-      weddingDateTime: '',
-      title: '결혼식까지'
+      year: '',
+      month: '',
+      day: '',
+      hour: '',
+      minute: ''
     } as DDayContent
   },
   { 
@@ -238,8 +244,11 @@ export const PRESET_CLASSIC: Block[] = [
     id: 'classic-dday',
     type: 'dday',
     content: {
-      weddingDateTime: '',
-      title: '결혼식까지'
+      year: '',
+      month: '',
+      day: '',
+      hour: '',
+      minute: ''
     } as DDayContent
   },
   { 
@@ -305,8 +314,11 @@ export const PRESET_MINIMAL: Block[] = [
     id: 'minimal-dday',
     type: 'dday',
     content: {
-      weddingDateTime: '',
-      title: '결혼식까지'
+      year: '',
+      month: '',
+      day: '',
+      hour: '',
+      minute: ''
     } as DDayContent
   },
   { 
@@ -401,8 +413,11 @@ export function createDefaultBlockContent(type: BlockType): Block['content'] {
       return {} as Record<string, never>;
     case 'dday':
       return {
-        weddingDateTime: '',
-        title: '결혼식까지'
+        year: '',
+        month: '',
+        day: '',
+        hour: '',
+        minute: ''
       } as DDayContent;
     default:
       return '';

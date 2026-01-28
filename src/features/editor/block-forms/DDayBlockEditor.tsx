@@ -24,27 +24,59 @@ export default function DDayBlockEditor({ content, onUpdate }: DDayBlockEditorPr
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-muted-foreground">결혼식 날짜 및 시간</label>
-        <input
-          type="text"
-          value={ddayInfo.weddingDateTime || ''}
-          onChange={handleChange('weddingDateTime')}
-          className={commonInputClass}
-          placeholder="2026-06-15 14:00:00"
-        />
-        <p className="text-xs text-muted-foreground">
-          형식: YYYY-MM-DD HH:mm:ss (예: 2026-06-15 14:00:00)
-        </p>
+        <label className="text-xs text-muted-foreground">결혼식 날짜</label>
+        <div className="flex gap-2 items-center">
+          <input
+            type="text"
+            value={ddayInfo.year || ''}
+            onChange={handleChange('year')}
+            className={`${commonInputClass} w-20`}
+            placeholder="2026"
+            maxLength={4}
+          />
+          <span className="text-xs text-muted-foreground">년</span>
+          <input
+            type="text"
+            value={ddayInfo.month || ''}
+            onChange={handleChange('month')}
+            className={`${commonInputClass} w-16`}
+            placeholder="06"
+            maxLength={2}
+          />
+          <span className="text-xs text-muted-foreground">월</span>
+          <input
+            type="text"
+            value={ddayInfo.day || ''}
+            onChange={handleChange('day')}
+            className={`${commonInputClass} w-16`}
+            placeholder="15"
+            maxLength={2}
+          />
+          <span className="text-xs text-muted-foreground">일</span>
+        </div>
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-muted-foreground">제목 (선택)</label>
-        <input
-          type="text"
-          value={ddayInfo.title || ''}
-          onChange={handleChange('title')}
-          className={commonInputClass}
-          placeholder="결혼식까지"
-        />
+        <label className="text-xs text-muted-foreground">예식 시간</label>
+        <div className="flex gap-2 items-center">
+          <input
+            type="text"
+            value={ddayInfo.hour || ''}
+            onChange={handleChange('hour')}
+            className={`${commonInputClass} w-16`}
+            placeholder="14"
+            maxLength={2}
+          />
+          <span className="text-xs text-muted-foreground">시</span>
+          <input
+            type="text"
+            value={ddayInfo.minute || ''}
+            onChange={handleChange('minute')}
+            className={`${commonInputClass} w-16`}
+            placeholder="00"
+            maxLength={2}
+          />
+          <span className="text-xs text-muted-foreground">분</span>
+        </div>
       </div>
     </div>
   );

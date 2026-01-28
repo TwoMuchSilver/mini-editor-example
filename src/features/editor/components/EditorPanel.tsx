@@ -421,9 +421,9 @@ export default function EditorPanel({ projectId: propProjectId }: EditorPanelPro
 
             // DDAY BLOCK
             if (block.type === 'dday') {
-              const ddayInfo = typeof block.content !== 'string' && 'weddingDateTime' in block.content
+              const ddayInfo = typeof block.content !== 'string' && 'year' in block.content
                 ? block.content as DDayContent
-                : { weddingDateTime: '', title: '결혼식까지' };
+                : { year: '', month: '', day: '', hour: '', minute: '' };
 
               return commonWrapper(
                 <DDayBlockEditor

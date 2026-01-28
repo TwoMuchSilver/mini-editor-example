@@ -82,8 +82,11 @@ export interface ImageGridContent {
 
 // 4-4. D-Day 카운트다운 데이터 구조
 export interface DDayContent {
-  weddingDateTime: string; // YYYY-MM-DD HH:mm:ss 형태
-  title?: string; // 커스텀 제목 (기본: "결혼식까지")
+  year: string;
+  month: string;
+  day: string;
+  hour: string;
+  minute: string;
 }
 
 // 5. 블록 하나가 가져야 할 정보
