@@ -11,6 +11,7 @@ import AccountBlock from "@/features/wedding/blocks/AccountBlock";
 import GuestbookBlock from "@/features/wedding/blocks/GuestbookBlock/GuestbookBlock";
 import DDayBlock from "@/features/wedding/blocks/DDayBlock";
 import RsvpBlock from "@/features/wedding/blocks/RsvpBlock";
+import TransportBlock from "@/features/wedding/blocks/TransportBlock/TransportBlock";
 
 interface Props {
   block: Block;
@@ -38,6 +39,8 @@ export default function BlockRenderer({ block, projectId }: Props) {
       return <DDayBlock block={block} />;
     case 'rsvp':
       return <RsvpBlock block={block} projectId={projectId} />;
+    case 'transport':
+      return <TransportBlock block={block} />;
     case 'guestbook':
       if (!projectId) {
         return <div>방명록</div>;

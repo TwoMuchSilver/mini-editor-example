@@ -1,5 +1,5 @@
 // 1. 우리가 지원할 블록의 종류
-export type BlockType = 'text' | 'image' | 'image_grid' | 'couple_info' | 'date' | 'map' | 'account' | 'guestbook' | 'dday' | 'rsvp';
+export type BlockType = 'text' | 'image' | 'image_grid' | 'couple_info' | 'date' | 'map' | 'account' | 'guestbook' | 'dday' | 'rsvp' | 'transport';
 
 // 1-1. 글로벌 테마 타입
 export interface GlobalTheme {
@@ -92,11 +92,22 @@ export interface RsvpContent {
   buttonText?: string; // 버튼 텍스트
 }
 
+// 4-6. 교통편 안내 데이터 구조
+export interface TransportItem {
+  type: 'subway' | 'bus' | 'car' | 'parking' | 'etc';
+  label?: string; // 커스텀 라벨 (예: "지하철 2호선")
+  text: string; // 상세 내용 (예: "강남역 1번 출구 도보 5분")
+}
+
+export interface TransportContent {
+  items: TransportItem[];
+}
+
 // 5. 블록 하나가 가져야 할 정보
 export interface Block {
   id: string;        // 고유 ID (순서 바꿀 때 필수)
   type: BlockType;   // 텍스트, 이미지 등 블록의 종류 
-  content: string | CoupleInfo | WeddingDate | MapInfo | AccountInfo | ImageGridContent | DDayContent | RsvpContent | Record<string, never>;   // 내용 (타입에 따라 다름)
+  content: string | CoupleInfo | WeddingDate | MapInfo | AccountInfo | ImageGridContent | DDayContent | RsvpContent | TransportContent | Record<string, never>;   // 내용 (타입에 따라 다름)
   
   // 6. 스타일 옵션 (선택 사항)
   styles?: {

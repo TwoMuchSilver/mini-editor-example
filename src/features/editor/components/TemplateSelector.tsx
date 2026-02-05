@@ -20,6 +20,7 @@ export default function TemplateSelector() {
       map: blocks.find(b => b.type === 'map')?.content,
       account: blocks.find(b => b.type === 'account')?.content,
       dday: blocks.find(b => b.type === 'dday')?.content,
+      transport: blocks.find(b => b.type === 'transport')?.content,
       // 첫 번째 이미지 블록을 대표 이미지로 간주
       mainImage: blocks.find(b => b.type === 'image' && typeof b.content === 'string' && b.content.length > 0)?.content,
     };
@@ -48,6 +49,9 @@ export default function TemplateSelector() {
           }
           if (block.type === 'dday' && currentData.dday) {
             return { ...block, content: currentData.dday };
+          }
+          if (block.type === 'transport' && currentData.transport) {
+            return { ...block, content: currentData.transport };
           }
           // 이미지는 첫 번째 이미지 블록에만 기존 대표 이미지를 적용
           if (block.type === 'image' && currentData.mainImage && !imageInjected) {

@@ -1,7 +1,7 @@
-
+// Schema Definitions - Updated 2023-02-20
 import { z } from 'zod';
 
-// 1. Basic Types
+// 1. Basic Types - Updated with transport
 export const BlockTypeSchema = z.enum([
   'text',
   'image',
@@ -12,6 +12,7 @@ export const BlockTypeSchema = z.enum([
   'account',
   'guestbook',
   'dday',
+  'transport',
   'rsvp'
 ]);
 
@@ -88,6 +89,16 @@ export const ImageGridContentSchema = z.object({
   slots: z.array(GridSlotDataSchema),
 });
 
+export const TransportItemSchema = z.object({
+  type: z.enum(['subway', 'bus', 'car', 'parking', 'etc']),
+  label: z.string().optional(), 
+  text: z.string(),
+});
+
+export const TransportContentSchema = z.object({
+  items: z.array(TransportItemSchema),
+});
+
 export const DDayContentSchema = z.object({
   weddingDateTime: z.string(),
   title: z.string().optional(),
@@ -111,6 +122,7 @@ export const BlockSchema = z.object({
     ImageGridContentSchema,
     DDayContentSchema,
     RsvpContentSchema,
+    TransportContentSchema,
     z.object({}).strict() // Empty object for guestbook
   ]),
   styles: z.object({
@@ -134,4 +146,6 @@ export type AccountInfo = z.infer<typeof AccountInfoSchema>;
 export type ImageGridContent = z.infer<typeof ImageGridContentSchema>;
 export type DDayContent = z.infer<typeof DDayContentSchema>;
 export type RsvpContent = z.infer<typeof RsvpContentSchema>;
+export type TransportItem = z.infer<typeof TransportItemSchema>;
+export type TransportContent = z.infer<typeof TransportContentSchema>;
 export type Block = z.infer<typeof BlockSchema>;

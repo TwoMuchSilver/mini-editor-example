@@ -1,5 +1,5 @@
 // features/wedding/templates/presets.ts
-import { Block, CoupleInfo, WeddingDate, MapInfo, AccountInfo, DDayContent, GlobalTheme } from "@/shared/types/block";
+import { Block, CoupleInfo, WeddingDate, MapInfo, AccountInfo, DDayContent, TransportContent, GlobalTheme } from "@/shared/types/block";
 
 // 테마 정의
 export const THEME_SIMPLE: GlobalTheme = {
@@ -75,7 +75,8 @@ export const PRESET_SIMPLE: Block[] = [
     content: { 
       weddingDateTime: '', 
       title: '결혼식까지' 
-    } as DDayContent
+    } as DDayContent,
+    styles: { variant: 'simple' }
   },
   { 
     id: 'simple-6', 
@@ -86,6 +87,18 @@ export const PRESET_SIMPLE: Block[] = [
       latitude: undefined, 
       longitude: undefined 
     } as MapInfo
+  },
+  {
+    id: 'simple-transport',
+    type: 'transport',
+    content: {
+      items: [
+        { type: 'subway', label: '지하철', text: '2호선 강남역 1번 출구 도보 5분' },
+        { type: 'bus', label: '버스', text: '강남역 정류장 하차 (100, 200번)' },
+        { type: 'parking', label: '주차', text: '건물 내 지하 주차장 이용 (2시간 무료)' }
+      ]
+    } as TransportContent,
+    styles: { variant: 'simple-list' }
   },
   { 
     id: 'simple-5', 
@@ -168,6 +181,15 @@ export const PRESET_PHOTO: Block[] = [
     } as WeddingDate,
     styles: { variant: 'circle' }
   },
+  {
+    id: 'photo-dday',
+    type: 'dday',
+    content: { 
+      weddingDateTime: '', 
+      title: '결혼식까지' 
+    } as DDayContent,
+    styles: { variant: 'circle' }
+  },
   { 
     id: 'photo-sub-img', 
     type: 'image', 
@@ -184,6 +206,17 @@ export const PRESET_PHOTO: Block[] = [
       longitude: undefined 
     } as MapInfo,
     styles: { variant: 'rounded' }
+  },
+  {
+    id: 'photo-transport',
+    type: 'transport',
+    content: {
+      items: [
+        { type: 'subway', label: 'Subway', text: '2호선 강남역 1번 출구' },
+        { type: 'car', label: 'Car', text: '네비게이션 "아펠가모" 검색' }
+      ]
+    } as TransportContent,
+    styles: { variant: 'card-grid' }
   },
   { 
     id: 'photo-5', 
@@ -261,6 +294,15 @@ export const PRESET_CLASSIC: Block[] = [
     } as WeddingDate,
     styles: { variant: 'classic' }
   },
+  {
+    id: 'classic-dday',
+    type: 'dday',
+    content: { 
+      weddingDateTime: '', 
+      title: '결혼식까지' 
+    } as DDayContent,
+    styles: { variant: 'classic' }
+  },
   { 
     id: 'classic-6', 
     type: 'map', 
@@ -270,6 +312,17 @@ export const PRESET_CLASSIC: Block[] = [
       latitude: undefined, 
       longitude: undefined 
     } as MapInfo
+  },
+  {
+    id: 'classic-transport',
+    type: 'transport',
+    content: {
+      items: [
+        { type: 'subway', label: '지하철 안내', text: '2호선 강남역 1번 출구로 나오시면\n도보 5분 거리에 위치해 있습니다.' },
+        { type: 'bus', label: '버스 안내', text: '간선 140, 402, 470\n지선 3412, 4412\n강남역 정류장 하차' }
+      ]
+    } as TransportContent,
+    styles: { variant: 'classic-centered' }
   },
   { 
     id: 'classic-5', 
@@ -430,6 +483,13 @@ export function createDefaultBlockContent(type: BlockType): Block['content'] {
       return { weddingDateTime: '', title: '결혼식까지' } as DDayContent;
     case 'rsvp':
       return { message: '', buttonText: '' };
+    case 'transport':
+      return { 
+        items: [
+          { type: 'subway', label: '지하철', text: '' },
+          { type: 'bus', label: '버스', text: '' }
+        ] 
+      } as TransportContent;
     default: return '';
   }
 }
@@ -446,4 +506,5 @@ export const BLOCK_TYPE_NAMES: Record<BlockType, string> = {
   guestbook: '방명록',
   dday: 'D-Day',
   rsvp: '참석 의사 전달',
+  transport: '교통편 안내',
 };

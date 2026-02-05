@@ -12,7 +12,7 @@ import ShareModal from '@/features/share/components/ShareModal';
 import TemplateSelector from './TemplateSelector';
 import { useDragAndDrop } from '../hooks/useDragAndDrop';
 import { useBlockManagement } from '../hooks/useBlockManagement';
-import { CoupleInfo, WeddingDate, MapInfo, AccountInfo, DDayContent, BlockType, type ImageGridContent } from '@/shared/types/block';
+import { CoupleInfo, WeddingDate, MapInfo, AccountInfo, DDayContent, BlockType, type ImageGridContent, type TransportContent } from '@/shared/types/block';
 import MapBlockEditor from '../block-forms/MapBlockEditor';
 import TextBlockEditor from '../block-forms/TextBlockEditor';
 import ImageBlockEditor from '../block-forms/ImageBlockEditor';
@@ -23,6 +23,7 @@ import AccountBlockEditor from '../block-forms/AccountBlockEditor';
 import GuestbookBlockEditor from '../block-forms/GuestbookBlockEditor';
 import DDayBlockEditor from '../block-forms/DDayBlockEditor';
 import RsvpBlockEditor from '../block-forms/RsvpBlockEditor';
+import TransportBlockEditor from '../block-forms/TransportBlockEditor';
 import { createDefaultBlockContent, BLOCK_TYPE_NAMES } from '@/features/wedding/templates/presets';
 import GridEditorModal from './GridEditorModal';
 //import { GRID_TEMPLATES } from '@/features/wedding/templates/gridTemplates';
@@ -433,9 +434,23 @@ export default function EditorPanel({ projectId: propProjectId }: EditorPanelPro
                 />
               );
             }
-          // RSVP BLOCK
+            // RSVP BLOCK
             if (block.type === 'rsvp') {
               return commonWrapper(<RsvpBlockEditor />);
+            }
+
+            // TRANSPORT BLOCK
+            if (block.type === 'transport') {
+              const transportContent = typeof block.content !== 'string' && 'items' in block.content
+                ? block.content as TransportContent
+                : { items: [] };
+
+              return commonWrapper(
+                <TransportBlockEditor
+                  content={transportContent}
+                  onUpdate={(content) => updateBlock(block.id, content)}
+                />
+              );
             }
 
             
