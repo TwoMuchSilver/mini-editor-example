@@ -41,7 +41,7 @@ export const CountdownTimer = memo(({ timeLeft, color, variant }: CountdownTimer
   if (variant === 'classic') {
     return (
       <div className="flex flex-col items-center gap-6 font-serif">
-        <div className="flex gap-8 justify-center items-end">
+        <div className="flex gap-4 justify-center items-end">
           <TimeUnitClassic value={timeLeft.days} label="Days" color={color} />
           <span className="text-2xl pb-4 opacity-30">:</span>
           <TimeUnitClassic value={timeLeft.hours} label="Hours" color={color} />
@@ -52,6 +52,22 @@ export const CountdownTimer = memo(({ timeLeft, color, variant }: CountdownTimer
         </div>
         <p className="text-base italic opacity-80" style={{ color: color }}>
           Together in {totalDays} days
+        </p>
+      </div>
+    );
+  }
+
+  if (variant === 'simple') {
+    return (
+      <div className="flex flex-col items-center gap-6">
+        <div className="flex gap-4 justify-center flex-wrap">
+          <TimeUnitSimple value={timeLeft.days} label="일" color={color} />
+          <TimeUnitSimple value={timeLeft.hours} label="시간" color={color} />
+          <TimeUnitSimple value={timeLeft.minutes} label="분" color={color} />
+          <TimeUnitSimple value={timeLeft.seconds} label="초" color={color} />
+        </div>
+        <p className="text-sm font-light tracking-wide opacity-70" style={{ color: color }}>
+          결혼식까지 <span className="font-semibold">{totalDays}일</span>
         </p>
       </div>
     );
@@ -117,6 +133,17 @@ function TimeUnitClassic({ value, label, color }: TimeUnitProps) {
         {String(value).padStart(2, '0')}
       </span>
       <span className="text-xs italic opacity-60" style={{ color: color }}>{label}</span>
+    </div>
+  );
+}
+
+function TimeUnitSimple({ value, label, color }: TimeUnitProps) {
+  return (
+    <div className="flex items-baseline gap-1">
+      <span className="text-3xl font-light tabular-nums" style={{ color: color || '#576b53' }}>
+        {String(value).padStart(2, '0')}
+      </span>
+      <span className="text-sm font-light opacity-70" style={{ color: color }}>{label}</span>
     </div>
   );
 }

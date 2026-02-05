@@ -16,12 +16,24 @@ export default function DDayBlock({ block }: Props) {
     defaultColor: string;
     defaultPadding: string;
   }> = {
-    modern: {
+    default: {
       defaultColor: 'inherit',
       defaultPadding: 'py-8',
     },
-    default: {
+    modern: {
       defaultColor: 'inherit',
+      defaultPadding: 'py-10',
+    },
+    circle: {
+      defaultColor: '#a16207',
+      defaultPadding: 'py-12',
+    },
+    classic: {
+      defaultColor: '#1c1917',
+      defaultPadding: 'py-10',
+    },
+    simple: {
+      defaultColor: '#576b53',
       defaultPadding: 'py-8',
     },
   };

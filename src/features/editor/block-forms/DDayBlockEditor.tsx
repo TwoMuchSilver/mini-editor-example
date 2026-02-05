@@ -42,8 +42,22 @@ export default function DDayBlockEditor({ content, onUpdate }: DDayBlockEditorPr
         return;
     }
 
-    const formattedDate = `${newYear}-${newMonth.padStart(2, '0')}-${newDay.padStart(2, '0')}`;
-    const formattedTime = `${newHour.padStart(2, '0')}:${newMinute.padStart(2, '0')}:00`;
+    // 입력 중에는 패딩을 강제하지 않음 (사용자 입력 방해 방지)
+    const formattedDate = `${newYear}-${newMonth}-${newDay}`;
+    const formattedTime = `${newHour}:${newMinute}:00`;
+    
+    onUpdate({
+      ...ddayInfo,
+      weddingDateTime: `${formattedDate} ${formattedTime}`
+    });
+  };
+
+  const handleBlur = () => {
+    // 포커스를 잃었을 때 포맷팅(패딩) 적용
+    if (!year && !month && !day) return;
+
+    const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    const formattedTime = `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}:00`;
     
     onUpdate({
       ...ddayInfo,
@@ -62,6 +76,7 @@ export default function DDayBlockEditor({ content, onUpdate }: DDayBlockEditorPr
             <input
               value={year}
               onChange={(e) => updateDateTime('year', e.target.value)}
+              onBlur={handleBlur}
               className={`${commonInputClass} w-14`}
               placeholder="2026"
             />
@@ -72,6 +87,7 @@ export default function DDayBlockEditor({ content, onUpdate }: DDayBlockEditorPr
             <input
               value={month}
               onChange={(e) => updateDateTime('month', e.target.value)}
+              onBlur={handleBlur}
               className={`${commonInputClass} w-10`}
               placeholder="06"
             />
@@ -82,6 +98,7 @@ export default function DDayBlockEditor({ content, onUpdate }: DDayBlockEditorPr
             <input
               value={day}
               onChange={(e) => updateDateTime('day', e.target.value)}
+              onBlur={handleBlur}
               className={`${commonInputClass} w-10`}
               placeholder="15"
             />
@@ -92,6 +109,7 @@ export default function DDayBlockEditor({ content, onUpdate }: DDayBlockEditorPr
             <input
               value={hour}
               onChange={(e) => updateDateTime('hour', e.target.value)}
+              onBlur={handleBlur}
               className={`${commonInputClass} w-10`}
               placeholder="14"
             />
@@ -102,6 +120,7 @@ export default function DDayBlockEditor({ content, onUpdate }: DDayBlockEditorPr
             <input
               value={minute}
               onChange={(e) => updateDateTime('minute', e.target.value)}
+              onBlur={handleBlur}
               className={`${commonInputClass} w-10`}
               placeholder="00"
             />

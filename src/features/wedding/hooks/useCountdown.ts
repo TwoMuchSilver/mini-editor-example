@@ -35,9 +35,32 @@ export function useCountdown(targetDate: string): CountdownTime {
 }
 
 function calculateTimeLeft(targetDate: string): CountdownTime {
+  // 빈 문자열이거나 유효하지 않은 값이면 기본값 반환
+  if (!targetDate) {
+    return {
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+      isExpired: true,
+    };
+  }
+
   const formattedDate = targetDate.replace(' ', 'T');
   
   const target = dayjs.tz(formattedDate, 'Asia/Seoul');
+  
+  // 날짜가 유효하지 않은 경우 처리
+  if (!target.isValid()) {
+    return {
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+      isExpired: true,
+    };
+  }
+
   const now = dayjs().tz('Asia/Seoul');
   
   const diff = target.diff(now);
