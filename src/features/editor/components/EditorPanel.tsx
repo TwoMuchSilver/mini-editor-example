@@ -110,17 +110,6 @@ export default function EditorPanel({ projectId: propProjectId }: EditorPanelPro
   // 저장 버튼 클릭 시
   const handleSave = async () => {
     if (isSaving) return; // 이미 저장 중이면 무시
-
-    // 프리미엄이 아니면 안내 모달 표시
-    if (!isPremium && projectId && projectId !== 'new') {
-      const confirmed = window.confirm(
-        '데모 버전에서는 워터마크가 표시됩니다.\n\n프리미엄 코드를 입력하시겠습니까?'
-      );
-      if (confirmed) {
-        setShowPremiumModal(true);
-        return;
-      }
-    }
     
     setIsSaving(true);
     try {
@@ -466,6 +455,8 @@ export default function EditorPanel({ projectId: propProjectId }: EditorPanelPro
         onClose={() => setIsModalOpen(false)} 
         url={shareUrl}
         blocks={blocks}
+        isPremium={isPremium}
+        onOpenPremiumModal={() => setShowPremiumModal(true)}
       />
 
       {/* 그리드 에디터 모달 */}
