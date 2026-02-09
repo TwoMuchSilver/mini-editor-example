@@ -30,7 +30,7 @@ export default function RsvpListModal({ isOpen, onClose, projectId }: Props) {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`/api/projects/${projectId}/rsvp`);
+        const res = await fetch(`/api/v1/wedding-editor/${projectId}/rsvp`);
         if (!res.ok) throw new Error('데이터를 불러오는데 실패했습니다.');
         const json = await res.json();
         setData(json.rsvps || []);

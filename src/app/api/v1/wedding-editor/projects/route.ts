@@ -1,4 +1,4 @@
-// app/api/projects/route.ts
+// app/api/v1/wedding-editor/projects/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { serverStorage } from '@/shared/utils/serverStorage';

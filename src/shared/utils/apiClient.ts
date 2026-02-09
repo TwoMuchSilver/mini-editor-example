@@ -2,7 +2,7 @@
 import { Block, GlobalTheme } from '@/shared/types/block';
 import { ProjectData } from './storage';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api/v1/wedding';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api/v1/wedding-editor';
 
 // API 클라이언트 함수들 (클라이언트 사이드에서 사용)
 export async function createProject(blocks: Block[], theme: GlobalTheme, title?: string): Promise<string> {
@@ -29,7 +29,7 @@ export async function updateProject(
   title?: string
 ): Promise<boolean> {
   try {
-    const response = await fetch(`${API_BASE_URL}/projects/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -57,7 +57,7 @@ export async function updateProject(
 
 export async function loadProject(id: string): Promise<ProjectData | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/projects/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/${id}`, {
       cache: 'no-store', // 항상 최신 데이터 가져오기
     });
 
@@ -76,7 +76,7 @@ export async function loadProject(id: string): Promise<ProjectData | null> {
 
 export async function projectExists(id: string): Promise<boolean> {
   try {
-    const response = await fetch(`${API_BASE_URL}/projects/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/${id}`, {
       method: 'HEAD',
       cache: 'no-store',
     });

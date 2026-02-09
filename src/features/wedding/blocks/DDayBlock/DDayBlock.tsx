@@ -1,6 +1,13 @@
+'use client';
+
+import dynamic from 'next/dynamic';
 import { Block, DDayContent } from '@/shared/types/block';
 import { useDDayBlock } from './useDDayBlock';
-import { WeddingCountdown } from '../../components/WeddingCountdown';
+
+const WeddingCountdown = dynamic(
+  () => import('../../components/WeddingCountdown').then(mod => ({ default: mod.WeddingCountdown })),
+  { ssr: false }
+);
 
 interface Props {
   block: Block;

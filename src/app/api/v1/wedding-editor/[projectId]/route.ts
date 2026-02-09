@@ -1,4 +1,4 @@
-// app/api/projects/[id]/route.ts
+// app/api/v1/wedding-editor/[projectId]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { serverStorage } from '@/shared/utils/serverStorage';
@@ -6,19 +6,19 @@ import { serverStorage } from '@/shared/utils/serverStorage';
 // GET: 프로젝트 조회
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
-    const { id } = await params;
+    const { projectId } = await params;
     
-    if (!id) {
+    if (!projectId) {
       return NextResponse.json(
         { error: '프로젝트 ID가 필요합니다.' },
         { status: 400 }
       );
     }
 
-    const projectData = await serverStorage.load(id);
+    const projectData = await serverStorage.load(projectId);
     
     if (!projectData) {
       return NextResponse.json(
@@ -40,16 +40,16 @@ export async function GET(
 // HEAD: 프로젝트 존재 여부 확인
 export async function HEAD(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
-    const { id } = await params;
+    const { projectId } = await params;
     
-    if (!id) {
+    if (!projectId) {
       return new NextResponse(null, { status: 400 });
     }
 
-    const exists = await serverStorage.exists(id);
+    const exists = await serverStorage.exists(projectId);
     return new NextResponse(null, { status: exists ? 200 : 404 });
   } catch (error) {
     console.error('프로젝트 존재 확인 오류:', error);
@@ -60,14 +60,14 @@ export async function HEAD(
 // PUT: 프로젝트 업데이트
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
-    const { id } = await params;
+    const { projectId } = await params;
     const body = await request.json();
     const { blocks, theme, title } = body;
 
-    if (!id) {
+    if (!projectId) {
       return NextResponse.json(
         { error: '프로젝트 ID가 필요합니다.' },
         { status: 400 }
@@ -81,8 +81,7 @@ export async function PUT(
       );
     }
 
-    // exists 체크 대신 update를 직접 시도하고, 업데이트된 행이 없으면 404 반환
-    const updated = await serverStorage.update(id, blocks, theme, title);
+    const updated = await serverStorage.update(projectId, blocks, theme, title);
     
     if (!updated) {
       return NextResponse.json(
@@ -91,7 +90,6 @@ export async function PUT(
       );
     }
 
-    // 프로젝트 업데이트 시 대시보드 페이지 캐시 즉시 갱신 (제목 변경 등 반영)
     revalidatePath('/dashboard');
     
     return NextResponse.json({ 

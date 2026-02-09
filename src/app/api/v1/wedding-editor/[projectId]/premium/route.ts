@@ -1,4 +1,4 @@
-// app/api/projects/[id]/premium/route.ts
+// app/api/v1/wedding-editor/[projectId]/premium/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
@@ -8,11 +8,11 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 interface RouteContext {
-  params: Promise<{ id: string }>;
+  params: Promise<{ projectId: string }>;
 }
 
 /**
- * POST /api/projects/[id]/premium
+ * POST /api/v1/wedding-editor/[projectId]/premium
  * 프로젝트를 프리미엄으로 설정
  */
 export async function POST(
@@ -20,7 +20,7 @@ export async function POST(
   context: RouteContext
 ) {
   try {
-    const { id: projectId } = await context.params;
+    const { projectId } = await context.params;
     const body = await request.json();
     const { code } = body;
 
@@ -31,7 +31,6 @@ export async function POST(
       );
     }
 
-    // 프로젝트 존재 확인
     const { data: project, error: projectError } = await supabase
       .from('project')
       .select('id')
@@ -45,7 +44,6 @@ export async function POST(
       );
     }
 
-    // 프로젝트를 프리미엄으로 업데이트
     const { error: updateError } = await supabase
       .from('project')
       .update({
@@ -77,7 +75,7 @@ export async function POST(
 }
 
 /**
- * DELETE /api/projects/[id]/premium
+ * DELETE /api/v1/wedding-editor/[projectId]/premium
  * 프로젝트의 프리미엄 상태 제거 (테스트용)
  */
 export async function DELETE(
@@ -85,7 +83,7 @@ export async function DELETE(
   context: RouteContext
 ) {
   try {
-    const { id: projectId } = await context.params;
+    const { projectId } = await context.params;
 
     const { error } = await supabase
       .from('project')

@@ -38,7 +38,7 @@ export default function RsvpModal({ isOpen, onClose, projectId }: RsvpModalProps
     setError(null);
 
     try {
-      const response = await fetch(`/api/projects/${projectId}/rsvp`, {
+      const response = await fetch(`/api/v1/wedding/projects/${projectId}/rsvp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
