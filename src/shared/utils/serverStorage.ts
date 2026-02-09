@@ -4,7 +4,7 @@ import { supabase } from "./supabase";
 
 // Supabase를 사용한 프로젝트 스토리지 구현
 class SupabaseProjectStorage implements ProjectStorage {
-  private readonly tableName = 'projects';
+  private readonly tableName = 'project';
 
   // 기본 제목 생성 (이름없는 청첩장 1, 2...)
   private async generateDefaultTitle(): Promise<string> {
