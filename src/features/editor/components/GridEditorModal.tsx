@@ -132,7 +132,7 @@ export default function GridEditorModal({ initialData, onSave, onClose }: GridEd
         throw new Error(data.message || '이미지 업로드에 실패했습니다.');
       }
 
-      const imageUrl = data.data?.url || data.url;
+      const imageUrl = data.data.url;
       
       if (editingSlot) {
         setEditingSlot({

@@ -42,7 +42,7 @@ export default function PremiumModal({ isOpen, onClose, onSuccess, projectId }: 
       }
 
       // 성공
-      await onSuccess(data.data?.code || code.trim().toUpperCase());
+      await onSuccess(data.data.code);
       setCode('');
     } catch (err) {
       console.error('코드 인증 오류:', err);

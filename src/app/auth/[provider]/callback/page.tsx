@@ -87,15 +87,13 @@ export default function OAuthCallbackPage() {
         const data = await res.json();
 
         if (res.ok) {
-          // 로그인 성공! 응답에 포함된 사용자 정보 + 만료시간 직접 저장
-          if (data.userInfo) {
-            useAuthStore.setState({ 
-              user: data.userInfo, 
+          const payload = data.data;
+          if (payload?.user) {
+            useAuthStore.setState({
+              user: payload.user,
               loading: false,
-              tokenExpiredAt: data.expiresAt ?? null,
+              tokenExpiredAt: payload.expiresAt ?? null,
             });
-            
-            // 프리미엄 상태도 확인
             const checkPremiumStatus = useAuthStore.getState().checkPremiumStatus;
             await checkPremiumStatus();
           }

@@ -8,6 +8,7 @@ import {
   extractRefreshTokenFromResponse,
   getTokenExpiration,
 } from '@/shared/utils/authServer';
+import { createSuccessResponse, createErrorResponse, ErrorCodes } from '@/shared/types/apiResponse';
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 
@@ -17,10 +18,12 @@ export async function POST() {
     const refreshToken = cookieStore.get(REFRESH_TOKEN_COOKIE)?.value;
 
     if (!refreshToken) {
-      return NextResponse.json({ success: false, code: 'AUTH_401' }, { status: 401 });
+      return NextResponse.json(
+        createErrorResponse(ErrorCodes.AUTH_UNAUTHORIZED, '인증이 필요합니다.'),
+        { status: 401 }
+      );
     }
 
-    // auth-BE는 refresh 시 쿠키의 refreshToken만 사용 (Authorization 아님)
     const res = await fetch(`${AUTH_BASE_URL}/api/v1/auth/members/refresh`, {
       method: 'POST',
       headers: {
@@ -30,7 +33,6 @@ export async function POST() {
       },
     });
 
-    // auth-BE가 HTML/텍스트로 에러 반환 시 JSON 파싱 실패 방지
     let data: Record<string, unknown> = {};
     const contentType = res.headers.get('content-type') ?? '';
     if (contentType.includes('application/json')) {
@@ -41,7 +43,6 @@ export async function POST() {
       }
     }
 
-    // auth-BE가 4xx/5xx 반환 시 로그 (원인 파악용)
     if (!res.ok) {
       console.error('[refresh] auth-BE 응답:', res.status, JSON.stringify(data));
     }
@@ -74,10 +75,7 @@ export async function POST() {
           // JWT 파싱 실패 시 무시
         }
 
-        return NextResponse.json(
-          { ...data, expiresAt },
-          { status: res.status }
-        );
+        return NextResponse.json(createSuccessResponse({ expiresAt }, '토큰이 갱신되었습니다.'));
       }
     }
 
@@ -85,7 +83,7 @@ export async function POST() {
   } catch (error) {
     console.error('[refresh]', error);
     return NextResponse.json(
-      { success: false, code: 'INTERNAL_ERROR', message: '토큰 갱신 중 오류가 발생했습니다.' },
+      createErrorResponse(ErrorCodes.COMMON_INTERNAL_ERROR, '토큰 갱신 중 오류가 발생했습니다.'),
       { status: 500 }
     );
   }

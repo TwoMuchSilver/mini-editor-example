@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { AUTH_BASE_URL, AUTH_COOKIE, getTokenExpiration } from '@/shared/utils/authServer';
+import { createSuccessResponse, createErrorResponse, ErrorCodes } from '@/shared/types/apiResponse';
 
 export async function GET() {
   const cookieStore = await cookies();
@@ -8,7 +9,7 @@ export async function GET() {
 
   if (!token) {
     return NextResponse.json(
-      { success: false, code: 'AUTH_401', message: '인증이 필요합니다.' },
+      createErrorResponse(ErrorCodes.AUTH_UNAUTHORIZED, '인증이 필요합니다.'),
       { status: 401 }
     );
   }
@@ -21,16 +22,14 @@ export async function GET() {
     },
   });
 
-  const data = await res.json();
-  
-  // 만료 시간 추가
+  const apiRes = (await res.json()) as { success: boolean; code: string; message: string; data?: { userId?: number; id?: string; email?: string; nickname?: string } };
+
   if (res.ok) {
     const expiresAt = getTokenExpiration(token);
-    return NextResponse.json({
-      ...data,
-      expiresAt,
-    }, { status: res.status });
+    const raw = apiRes.data ?? {};
+    const user = { id: String(raw.userId ?? raw.id ?? ''), email: raw.email, nickname: raw.nickname };
+    return NextResponse.json(createSuccessResponse({ user, expiresAt }, '요청이 성공적으로 처리되었습니다.'));
   }
 
-  return NextResponse.json(data, { status: res.status });
+  return NextResponse.json(apiRes, { status: res.status });
 }

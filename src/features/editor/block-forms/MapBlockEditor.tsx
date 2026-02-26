@@ -41,7 +41,7 @@ export default function MapBlockEditor({ mapInfo, onUpdate }: MapBlockEditorProp
     try {
       const response = await fetch(`/api/wedding/search/address?query=${encodeURIComponent(mainAddress)}`);
       const coordData = await response.json();
-      if (response.ok && coordData.data?.documents && coordData.data.documents.length > 0) {
+      if (response.ok && coordData.data.documents && coordData.data.documents.length > 0) {
         const firstDoc = coordData.data.documents[0];
         // 카카오 로컬 API 응답 형식: y는 위도, x는 경도
         // 좌표와 함께 업데이트
@@ -84,7 +84,7 @@ export default function MapBlockEditor({ mapInfo, onUpdate }: MapBlockEditorProp
       if (!response.ok) {
         throw new Error(data.message || '검색에 실패했습니다.');
       }
-      setSearchResults(data.data?.places || data.places || []);
+      setSearchResults(data.data.places);
       setShowResults(true);
     } catch (error) {
       console.error('장소 검색 오류:', error);

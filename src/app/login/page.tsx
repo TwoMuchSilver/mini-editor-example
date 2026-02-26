@@ -634,19 +634,16 @@ function LoginPageContent() {
         return;
       }
 
-      // 로그인 성공! 응답에 포함된 사용자 정보 + 만료시간 직접 저장
-      if (loginData.userInfo) {
-        useAuthStore.setState({ 
-          user: loginData.userInfo, 
+      const payload = loginData.data;
+      if (payload?.user) {
+        useAuthStore.setState({
+          user: payload.user,
           loading: false,
-          tokenExpiredAt: loginData.expiresAt ?? null,
+          tokenExpiredAt: payload.expiresAt ?? null,
         });
-        
-        // 프리미엄 상태도 확인
         const checkPremiumStatus = useAuthStore.getState().checkPremiumStatus;
         await checkPremiumStatus();
       } else {
-        // userInfo가 없으면 /me로 조회 (fallback)
         await checkAuth();
       }
       

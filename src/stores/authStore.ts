@@ -52,10 +52,11 @@ export const useAuthStore = create<AuthState>()(
           
           if (res.ok) {
             const data = await res.json();
+            const payload = data.data ?? {};
             set({
-              user: data.data,
+              user: payload.user ?? null,
               loading: false,
-              tokenExpiredAt: data.expiresAt ?? null,
+              tokenExpiredAt: payload.expiresAt ?? null,
             });
             await get().checkPremiumStatus();
           } else if (res.status === 401) {
@@ -78,7 +79,7 @@ export const useAuthStore = create<AuthState>()(
           });
           if (res.ok) {
             const data = await res.json();
-            set({ isPremium: data.isPremium ?? false });
+            set({ isPremium: data.data?.isPremium ?? false });
           } else {
             set({ isPremium: false });
           }
@@ -137,7 +138,8 @@ export const useAuthStore = create<AuthState>()(
             const data = await res.json();
 
             if (res.ok) {
-              if (data.expiresAt) set({ tokenExpiredAt: data.expiresAt });
+              const expiresAt = data.data?.expiresAt;
+              if (expiresAt != null) set({ tokenExpiredAt: expiresAt });
               return true;
             } else {
               // 429 Too Many Requests: rate limit, 로그아웃하지 않고 나중에 재시도

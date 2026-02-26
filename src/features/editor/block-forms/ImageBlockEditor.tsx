@@ -36,7 +36,7 @@ export default function ImageBlockEditor({ content, onUpdate }: ImageBlockEditor
         throw new Error(data.message || '이미지 업로드에 실패했습니다.');
       }
 
-      onUpdate(data.data?.url || data.url);
+      onUpdate(data.data.url);
     } catch (error) {
       console.error('이미지 업로드 오류:', error);
       alert(error instanceof Error ? error.message : '이미지 업로드에 실패했습니다.');

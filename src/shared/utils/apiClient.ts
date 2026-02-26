@@ -2,6 +2,14 @@
 // 프로젝트 관련 API는 그대로 유지하고, 인증 체크만 추가
 
 import { useAuthStore } from '@/stores/authStore';
+import type { ApiResponse } from '@/shared/types/apiResponse';
+import type { Block, GlobalTheme } from '@/shared/types/block';
+
+export interface ProjectData {
+  blocks: Block[];
+  theme: GlobalTheme;
+  title?: string;
+}
 
 export class ProjectAccessError extends Error {
   constructor(
@@ -65,7 +73,7 @@ export async function authFetch(url: string, options?: RequestInit): Promise<Res
 }
 
 // 기존 프로젝트 API 함수들
-export async function loadProject(projectId: string) {
+export async function loadProject(projectId: string): Promise<ProjectData> {
   const res = await authFetch(`/api/v1/wedding-editor/${projectId}`);
 
   if (res.status === 401) {
@@ -78,7 +86,9 @@ export async function loadProject(projectId: string) {
     throw new ProjectAccessError('프로젝트를 찾을 수 없습니다', 404);
   }
 
-  return res.json();
+  const json = (await res.json()) as ApiResponse<ProjectData>;
+  if (!json.data) throw new ProjectAccessError('프로젝트 데이터 형식이 올바르지 않습니다.', 500);
+  return json.data as ProjectData;
 }
 
 export async function saveProject(projectId: string, data: unknown) {
